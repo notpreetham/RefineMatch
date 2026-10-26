@@ -1,0 +1,19 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# VS Code
+.vscode/
+
+# Project specific data ignores (keep the folders, ignore the contents if they get too big)
+# data/raw/*
+# !data/raw/.gitkeep
