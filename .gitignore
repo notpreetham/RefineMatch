@@ -17,3 +17,7 @@ __pycache__/
 # Project specific data ignores (keep the folders, ignore the contents if they get too big)
 # data/raw/*
 # !data/raw/.gitkeep
+data/
+*.tsv
+*.dsv
+
