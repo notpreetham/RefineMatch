@@ -1,0 +1,10 @@
+{
+  "description": "Helps security teams investigate threats by matching known attack patterns to enterprise telemetry, visualizing evidence and validating node-level correspondences.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
