@@ -1,25 +1,69 @@
+"""Tests for src.refinement.ambiguity (hand-checkable star / path graphs)."""
+
 import networkx as nx
+
 from src.core.models import RefinementResult
-from src.refinement.ambiguity import find_ambiguous_classes, rank_ambiguous_classes
+from src.refinement.ambiguity import (
+    calculate_ambiguity_score, find_ambiguous_classes, rank_ambiguous_classes)
+from src.refinement.color_refinement import color_refine
 
 
-def test_ambiguity_detection_and_ranking():
-    # Build a tiny 4-node cycle graph
-    g = nx.cycle_graph(4, create_using=nx.DiGraph)
+def g(edges):
+    graph = nx.DiGraph()
+    for u, v in edges:
+        graph.add_edge(u, v, edge_type="e", edge_types={"e": 1})
+    return graph
 
-    # Mock RefinementResult where nodes 0, 1, 2 share 'color_A', and node 3 has unique 'color_B'
-    mock_refinement = RefinementResult(
-        node_colors={"0": "color_A", "1": "color_A", "2": "color_A", "3": "color_B"},
-        color_classes={"color_A": ["0", "1", "2"], "color_B": ["3"]},
-        iterations=2,
-        stable=True,
-    )
 
-    ambiguous = find_ambiguous_classes(mock_refinement)
-    assert "color_A" in ambiguous
-    assert "color_B" not in ambiguous
-    assert len(ambiguous["color_A"]) == 3
+def test_find_ambiguous_classes_star():
+    graph = g([("hub", "x"), ("hub", "y"), ("hub", "z")])
+    amb = find_ambiguous_classes(color_refine(graph))
+    assert list(amb.values()) == [["x", "y", "z"]]
 
-    ranked = rank_ambiguous_classes(g, mock_refinement)
-    assert len(ranked) == 1
-    assert ranked[0][0] == "color_A"
+
+def test_no_ambiguity_on_path():
+    graph = g([("a", "b"), ("b", "c"), ("c", "d")])
+    assert find_ambiguous_classes(color_refine(graph)) == {}
+    assert rank_ambiguous_classes(graph, color_refine(graph)) == []
+
+
+def test_empty_refinement():
+    assert find_ambiguous_classes(RefinementResult({}, {}, 0, True)) == {}
+
+
+def test_score_hand_checked_values():
+    graph = g([("hub", "x"), ("hub", "y")])
+    # size 2 -> size_term 0.5; each leaf degree 1 -> d/(d+1) = 0.5; score = 0.5*(0.5+0.25)
+    assert abs(calculate_ambiguity_score(graph, ["x", "y"]) - 0.375) < 1e-12
+
+
+def test_score_zero_for_singletons_and_unknown_nodes():
+    graph = g([("a", "b")])
+    assert calculate_ambiguity_score(graph, ["a"]) == 0.0
+    assert calculate_ambiguity_score(graph, []) == 0.0
+    assert calculate_ambiguity_score(graph, ["ghost", "phantom"]) == 0.0
+
+
+def test_larger_and_better_connected_classes_score_higher():
+    graph = g([("hub", f"l{i}") for i in range(4)])
+    graph.add_nodes_from(["iso1", "iso2"])
+    leaves2, leaves4 = ["l0", "l1"], ["l0", "l1", "l2", "l3"]
+    assert calculate_ambiguity_score(graph, leaves4) > calculate_ambiguity_score(graph, leaves2)
+    assert calculate_ambiguity_score(graph, leaves2) > calculate_ambiguity_score(graph, ["iso1", "iso2"])
+
+
+def test_score_bounded_and_rank_sorted_descending():
+    graph = g([("hub", f"l{i}") for i in range(5)])
+    graph.add_nodes_from(["iso1", "iso2"])
+    ranked = rank_ambiguous_classes(graph, color_refine(graph))
+    scores = [s for _, s in ranked]
+    assert scores == sorted(scores, reverse=True) and len(ranked) == 2
+    assert all(0.0 <= s < 1.0 for s in scores)
+
+
+def test_ranking_is_deterministic_and_id_independent():
+    a = g([("hub", "x"), ("hub", "y"), ("p", "q"), ("p", "r")])
+    b = nx.relabel_nodes(a, {n: f"zz{i}" for i, n in enumerate(a.nodes)})
+    ra = rank_ambiguous_classes(a, color_refine(a))
+    rb = rank_ambiguous_classes(b, color_refine(b))
+    assert ra == rb == rank_ambiguous_classes(a, color_refine(a))

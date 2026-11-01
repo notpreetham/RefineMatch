@@ -200,6 +200,21 @@ export type MappedNode = {
   pid: string
 }
 
+export type PatternOption = {
+  id: string
+  name: string
+  description: string
+  nodes: number
+  edges: number
+}
+
+export type RankedMatch = {
+  pattern_id: string
+  name: string
+  similarity_score: number
+  coverage: number
+}
+
 const defaultNodes: MappedNode[] = [
   {
     id: "proc_101",
@@ -600,6 +615,9 @@ export default function App() {
     agir_steps: number
     matched_nodes_count: number
     node_mapping: MappedNode[]
+    threat_name?: string
+    signature_id?: string
+    description?: string
   }>({
     similarity_score: 0.9965,
     reference_coverage: 1.0,
@@ -608,9 +626,15 @@ export default function App() {
     agir_steps: 7,
     matched_nodes_count: 4,
     node_mapping: defaultNodes,
+    threat_name: "Drive-by Download & In-Memory Code Injection",
+    signature_id: "SUSP_SYN_003",
+    description: "Multi-stage provenance threat sequence matched against telemetry log.",
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [patterns, setPatterns] = useState<PatternOption[]>([])
+  const [selectedPattern, setSelectedPattern] = useState<string>("ALL")
+  const [rankedMatches, setRankedMatches] = useState<RankedMatch[]>([])
   const nodes = matchData.node_mapping
   const [bridge, setBridge] = useState<{
     x1: number
@@ -697,13 +721,17 @@ export default function App() {
     }
   }
 
-  const runMatching = async (fileOverride?: File | null) => {
+  const runMatching = async (fileOverride?: File | null, patternOverride?: string) => {
     setIsLoading(true)
     const targetFile = fileOverride !== undefined ? fileOverride : selectedFile
+    const targetPattern = patternOverride !== undefined ? patternOverride : selectedPattern
+
     notify(
-      targetFile
-        ? `Uploading ${targetFile.name} & running 1-WL + AGIR matching...`
-        : "Executing 1-WL refinement and Hungarian matching...",
+      targetPattern === "ALL"
+        ? (targetFile
+            ? `Scanning ${targetFile.name} across attack pattern bank...`
+            : "Scanning telemetry across stored attack pattern bank...")
+        : `Evaluating match against signature ${targetPattern}...`,
     )
     try {
       const endpoints = ["/api/run-match", "http://127.0.0.1:8000/api/run-match"]
@@ -713,10 +741,12 @@ export default function App() {
       if (targetFile) {
         formData.append("file", targetFile)
       }
+      formData.append("target_pattern_id", targetPattern)
 
       for (const ep of endpoints) {
         try {
-          const res = await fetch(ep, {
+          const url = `${ep}?target_pattern_id=${encodeURIComponent(targetPattern)}`
+          const res = await fetch(url, {
             method: "POST",
             body: targetFile ? formData : undefined,
           })
@@ -724,7 +754,7 @@ export default function App() {
             data = await res.json()
             break
           } else if (!targetFile) {
-            const getRes = await fetch(ep)
+            const getRes = await fetch(url)
             if (getRes.ok) {
               data = await getRes.json()
               break
@@ -744,9 +774,15 @@ export default function App() {
           agir_steps: Number(data.agir_steps ?? 7),
           matched_nodes_count: Number(data.matched_nodes_count ?? 4),
           node_mapping: data.node_mapping?.length ? data.node_mapping : defaultNodes,
+          threat_name: data.threat_name,
+          signature_id: data.signature_id,
+          description: data.description,
         })
+        if (Array.isArray(data.ranked_matches)) {
+          setRankedMatches(data.ranked_matches)
+        }
         notify(
-          `Matching complete: ${(Number(data.similarity_score) * 100).toFixed(2)}% similarity across ${Number(data.total_events).toLocaleString()} events`,
+          `Match complete: ${data.threat_name || data.signature_id} (${(Number(data.similarity_score) * 100).toFixed(1)}%)`,
         )
       } else if (data && data.detail) {
         notify(`Error: ${data.detail}`)
@@ -762,7 +798,29 @@ export default function App() {
   }
 
   useEffect(() => {
-    runMatching()
+    const fetchPatterns = async () => {
+      try {
+        const endpoints = ["/api/patterns", "http://127.0.0.1:8000/api/patterns"]
+        for (const ep of endpoints) {
+          try {
+            const res = await fetch(ep)
+            if (res.ok) {
+              const data = await res.json()
+              if (Array.isArray(data)) {
+                setPatterns(data)
+                break
+              }
+            }
+          } catch {
+            // try next
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load pattern bank", e)
+      }
+    }
+    fetchPatterns()
+    runMatching(null, "ALL")
   }, [])
 
   const inspect = (n: number) => {
@@ -976,6 +1034,52 @@ export default function App() {
                   </div>
                 )}
               </div>
+              <div
+                className="pattern-selector-container"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                }}
+              >
+                <select
+                  value={selectedPattern}
+                  onChange={(e) => {
+                    const newPat = e.target.value
+                    setSelectedPattern(newPat)
+                    runMatching(undefined, newPat)
+                  }}
+                  disabled={isLoading}
+                  style={{
+                    height: "36px",
+                    padding: "0 28px 0 12px",
+                    fontSize: "13px",
+                    fontWeight: 500,
+                    borderRadius: "6px",
+                    backgroundColor: "rgba(30, 41, 59, 0.7)",
+                    border: "1px solid rgba(148, 163, 184, 0.25)",
+                    color: "#e2e8f0",
+                    cursor: "pointer",
+                    outline: "none",
+                    appearance: "none",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 10px center",
+                    maxWidth: "240px",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                  title="Select attack signature or scan all"
+                >
+                  <option value="ALL" style={{ backgroundColor: "#0f172a", color: "#e2e8f0" }}>
+                    🎯 Auto-Detect (Scan All Patterns)
+                  </option>
+                  {patterns.map((p) => (
+                    <option key={p.id} value={p.id} style={{ backgroundColor: "#0f172a", color: "#e2e8f0" }}>
+                      {p.id}: {p.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <label
                 className="btn upload-dataset-btn"
                 style={{
@@ -1116,21 +1220,31 @@ export default function App() {
                   <span className="status-dot" />
                   {ack ? "RESOLVED" : "CRITICAL DETECTION"}
                 </Tag>
-                <span className="mono">CVE-2026-StreamSpot</span>
+                <span className="mono">{matchData.signature_id || "CVE-2026-StreamSpot"}</span>
                 <span className="threat-detected">
                   <Icon name="clock" size={12} />
                   Detected at 12:04:58 UTC
                 </span>
               </div>
-              <h2>Drive-by Download & In-Memory Code Injection</h2>
+              <h2>{matchData.threat_name || "Drive-by Download & In-Memory Code Injection"}</h2>
               <p>
-                A 4-node exploit pattern identified with{" "}
-                <strong>99.65% structural correspondence</strong> across{" "}
-                <strong>8,295 enterprise events.</strong> Host{" "}
-                <code>srv-edge-04</code>{" "}
-                <span className="subtle">(N_0001)</span> spawned a rogue browser
-                process, connected to an untrusted endpoint, and staged a binary
-                drop in <code>/tmp</code>.
+                {matchData.description ? (
+                  <>
+                    {matchData.description}{" "}
+                    Identified with <strong>{(matchData.similarity_score * 100).toFixed(2)}% structural correspondence</strong> across{" "}
+                    <strong>{matchData.total_events.toLocaleString()} enterprise events</strong> with {matchData.matched_nodes_count} matched provenance nodes.
+                  </>
+                ) : (
+                  <>
+                    A {matchData.matched_nodes_count}-node exploit pattern identified with{" "}
+                    <strong>{(matchData.similarity_score * 100).toFixed(2)}% structural correspondence</strong> across{" "}
+                    <strong>{matchData.total_events.toLocaleString()} enterprise events.</strong> Host{" "}
+                    <code>srv-edge-04</code>{" "}
+                    <span className="subtle">(N_0001)</span> spawned a rogue browser
+                    process, connected to an untrusted endpoint, and staged a binary
+                    drop in <code>/tmp</code>.
+                  </>
+                )}
               </p>
               <div className="attack-tags">
                 <Tag>
@@ -1158,6 +1272,128 @@ export default function App() {
               <Icon name="external" size={17} />
             </button>
           </section>
+
+          {rankedMatches && rankedMatches.length > 0 && (
+            <div
+              className="threat-leaderboard"
+              style={{
+                marginBottom: "16px",
+                padding: "12px 16px",
+                borderRadius: "8px",
+                background: "rgba(15, 23, 42, 0.65)",
+                border: "1px solid rgba(148, 163, 184, 0.15)",
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: "8px",
+                  fontSize: "12px",
+                  fontWeight: 600,
+                  letterSpacing: "0.05em",
+                  color: "#94a3b8",
+                  textTransform: "uppercase",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                  <Icon name="target" size={14} />
+                  <span>Threat Detection Leaderboard ({rankedMatches.length} Signatures Evaluated)</span>
+                </div>
+                <span style={{ fontSize: "11px", color: "#64748b" }}>
+                  Click signature to inspect specific mapping
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: "10px",
+                  overflowX: "auto",
+                  paddingBottom: "4px",
+                }}
+              >
+                {rankedMatches.map((m, idx) => {
+                  const isSelected =
+                    selectedPattern === m.pattern_id ||
+                    (selectedPattern === "ALL" && matchData.signature_id === m.pattern_id)
+                  const simPct = (m.similarity_score * 100).toFixed(1)
+                  return (
+                    <button
+                      key={m.pattern_id}
+                      onClick={() => {
+                        setSelectedPattern(m.pattern_id)
+                        runMatching(undefined, m.pattern_id)
+                      }}
+                      disabled={isLoading}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                        padding: "6px 12px",
+                        borderRadius: "6px",
+                        border: isSelected
+                          ? "1px solid var(--accent-teal, #2dd4bf)"
+                          : "1px solid rgba(148, 163, 184, 0.18)",
+                        background: isSelected
+                          ? "rgba(45, 212, 191, 0.15)"
+                          : "rgba(30, 41, 59, 0.5)",
+                        color: isSelected ? "#ffffff" : "#cbd5e1",
+                        fontSize: "12px",
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        transition: "all 0.2s ease",
+                      }}
+                      title={`${m.name} (${m.pattern_id}) - Score: ${simPct}%`}
+                    >
+                      <span
+                        style={{
+                          fontWeight: 700,
+                          color: isSelected ? "var(--accent-teal, #2dd4bf)" : "#94a3b8",
+                        }}
+                      >
+                        #{idx + 1}
+                      </span>
+                      <span style={{ fontWeight: 600 }}>{m.pattern_id}</span>
+                      <span
+                        style={{
+                          maxWidth: "140px",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          color: "#94a3b8",
+                        }}
+                      >
+                        {m.name}
+                      </span>
+                      <span
+                        style={{
+                          padding: "2px 6px",
+                          borderRadius: "4px",
+                          fontSize: "11px",
+                          fontWeight: 700,
+                          backgroundColor:
+                            m.similarity_score >= 0.8
+                              ? "rgba(34, 197, 94, 0.2)"
+                              : m.similarity_score >= 0.5
+                              ? "rgba(234, 179, 8, 0.2)"
+                              : "rgba(100, 116, 139, 0.2)",
+                          color:
+                            m.similarity_score >= 0.8
+                              ? "#4ade80"
+                              : m.similarity_score >= 0.5
+                              ? "#facc15"
+                              : "#94a3b8",
+                        }}
+                      >
+                        {simPct}%
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           <section className="metrics-grid">
             <div className="metric-card">

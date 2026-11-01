@@ -1,0 +1,8 @@
+method,tp,fp,tn,fn,precision,recall,f1,fpr,fnr,tuned_margin,runtime_seconds_mean,n_test,status,weights,threshold,dev_f1
+degree_statistics,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-0.15,0.0003258659166665012,24,ok,,,
+color_refinement_only,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-1.0,0.003609252124999666,24,ok,,,
+graph2vec_style_wl,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-0.95,0.0066382289166663595,24,ok,,,
+graph_edit_distance,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-0.35,1.025675019625,24,ok,,,
+cr_random_individualization,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-1.0,0.006492188458333696,24,ok,,,
+refinematch_structure_only_margin,15,0,9,0,1.0,1.0,1.0,0.0,0.0,-1.0,0.01168697587499897,24,ok,,,
+refinematch_full,15,0,9,0,1.0,1.0,1.0,0.0,0.0,,0.010519936708334399,24,ok,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0

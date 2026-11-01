@@ -1,0 +1,92 @@
+{
+  "pattern_id": "BENIGN_SYN_003",
+  "name": "Multi-tier web application",
+  "category": "benign",
+  "technique": "",
+  "description": "Client -> web -> two app servers -> database.",
+  "source": "synthetic",
+  "generator": "multi_server_application",
+  "required_node_roles": [
+    {
+      "role": "client",
+      "node_type": "client"
+    },
+    {
+      "role": "web",
+      "node_type": "server"
+    },
+    {
+      "role": "app1",
+      "node_type": "application_server"
+    },
+    {
+      "role": "app2",
+      "node_type": "application_server"
+    },
+    {
+      "role": "db",
+      "node_type": "database"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "client",
+      "destination": "web",
+      "edge_type": "http_request",
+      "count": 15,
+      "interval_seconds": 10,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "web",
+      "destination": "app1",
+      "edge_type": "rpc_call",
+      "count": 15,
+      "interval_seconds": 10,
+      "start_offset_seconds": 14
+    },
+    {
+      "source": "web",
+      "destination": "app2",
+      "edge_type": "rpc_call",
+      "count": 15,
+      "interval_seconds": 10,
+      "start_offset_seconds": 28
+    },
+    {
+      "source": "app1",
+      "destination": "db",
+      "edge_type": "sql_query",
+      "count": 10,
+      "interval_seconds": 12,
+      "start_offset_seconds": 42
+    },
+    {
+      "source": "app2",
+      "destination": "db",
+      "edge_type": "sql_query",
+      "count": 10,
+      "interval_seconds": 12,
+      "start_offset_seconds": 56
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    },
+    {
+      "before_edge": 2,
+      "after_edge": 3
+    },
+    {
+      "before_edge": 3,
+      "after_edge": 4
+    }
+  ],
+  "optional_nodes": []
+}

@@ -1,0 +1,60 @@
+{
+  "pattern_id": "BENIGN_SYN_002",
+  "name": "Normal application database access",
+  "category": "benign",
+  "technique": "",
+  "description": "An app queries a database; rare admin access.",
+  "source": "synthetic",
+  "generator": "normal_database_access",
+  "required_node_roles": [
+    {
+      "role": "app",
+      "node_type": "application_server"
+    },
+    {
+      "role": "db",
+      "node_type": "database"
+    },
+    {
+      "role": "admin",
+      "node_type": "client"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "app",
+      "destination": "db",
+      "edge_type": "sql_query",
+      "count": 20,
+      "interval_seconds": 15,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "db",
+      "destination": "app",
+      "edge_type": "sql_result",
+      "count": 20,
+      "interval_seconds": 15,
+      "start_offset_seconds": 12
+    },
+    {
+      "source": "admin",
+      "destination": "db",
+      "edge_type": "sql_admin",
+      "count": 2,
+      "interval_seconds": 300,
+      "start_offset_seconds": 60
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    }
+  ],
+  "optional_nodes": []
+}

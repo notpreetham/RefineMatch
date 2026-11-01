@@ -1,0 +1,5 @@
+method,tp,fp,tn,fn,precision,recall,f1,fpr,fnr,weights,threshold,dev_f1,n_test,mean_true_pattern_similarity,mean_role_exact_matching_accuracy,mean_individualizations,runtime_seconds_mean
+identifiers_only,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24,1.0,1.0,1.0,0.010870796916666
+host_count_change,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24,0.8976923166853722,0.8611111111111112,0.0,0.011165117916666153
+frequency_change,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24,1.0,1.0,1.0,0.010785981208333814
+benign_topology_noise,14,0,9,1,1.0,0.9333333333333333,0.9655172413793104,0.0,0.06666666666666667,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24,0.8238644547325102,0.875,0.0,0.010431943208333294

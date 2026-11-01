@@ -15,9 +15,12 @@ __pycache__/
 .vscode/
 
 # Project specific data ignores (keep the folders, ignore the contents if they get too big)
-# data/raw/*
-# !data/raw/.gitkeep
-data/
+data/raw/*
+data/processed/*
+data/mutations/*
+data/streamspot/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/mutations/.gitkeep
 *.tsv
 *.dsv
-

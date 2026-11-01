@@ -1,0 +1,44 @@
+{
+  "pattern_id": "BENIGN_SYN_001",
+  "name": "Normal client-server exchange",
+  "category": "benign",
+  "technique": "",
+  "description": "A client repeatedly requests a server.",
+  "source": "synthetic",
+  "generator": "normal_client_server",
+  "required_node_roles": [
+    {
+      "role": "client",
+      "node_type": "client"
+    },
+    {
+      "role": "server",
+      "node_type": "server"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "client",
+      "destination": "server",
+      "edge_type": "http_request",
+      "count": 12,
+      "interval_seconds": 20,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "server",
+      "destination": "client",
+      "edge_type": "http_response",
+      "count": 12,
+      "interval_seconds": 20,
+      "start_offset_seconds": 12
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    }
+  ],
+  "optional_nodes": []
+}

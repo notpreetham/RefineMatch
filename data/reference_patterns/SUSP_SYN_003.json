@@ -1,0 +1,144 @@
+{
+  "pattern_id": "SUSP_SYN_003",
+  "name": "Scanning-like fan-out (synthetic)",
+  "category": "suspicious",
+  "technique": "T1046 (analogy only)",
+  "description": "One source probes many targets once each.",
+  "source": "synthetic",
+  "generator": "scanning_like",
+  "required_node_roles": [
+    {
+      "role": "scanner",
+      "node_type": "external"
+    },
+    {
+      "role": "t1",
+      "node_type": "server"
+    },
+    {
+      "role": "t2",
+      "node_type": "server"
+    },
+    {
+      "role": "t3",
+      "node_type": "server"
+    },
+    {
+      "role": "t4",
+      "node_type": "server"
+    },
+    {
+      "role": "t5",
+      "node_type": "server"
+    },
+    {
+      "role": "t6",
+      "node_type": "server"
+    },
+    {
+      "role": "t7",
+      "node_type": "server"
+    },
+    {
+      "role": "t8",
+      "node_type": "server"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "scanner",
+      "destination": "t1",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 10.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t2",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 20.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t3",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 30.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t4",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 40.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t5",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 50.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t6",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 60.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t7",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 70.0
+    },
+    {
+      "source": "scanner",
+      "destination": "t8",
+      "edge_type": "probe",
+      "count": 1,
+      "interval_seconds": 1,
+      "start_offset_seconds": 80.0
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    },
+    {
+      "before_edge": 2,
+      "after_edge": 3
+    },
+    {
+      "before_edge": 3,
+      "after_edge": 4
+    },
+    {
+      "before_edge": 4,
+      "after_edge": 5
+    },
+    {
+      "before_edge": 5,
+      "after_edge": 6
+    },
+    {
+      "before_edge": 6,
+      "after_edge": 7
+    }
+  ],
+  "optional_nodes": []
+}

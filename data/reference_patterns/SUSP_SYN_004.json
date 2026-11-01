@@ -1,0 +1,44 @@
+{
+  "pattern_id": "SUSP_SYN_004",
+  "name": "Command-and-control-like beaconing (synthetic)",
+  "category": "suspicious",
+  "technique": "T1071 (analogy only)",
+  "description": "An internal host beacons periodically to an external host that rarely replies.",
+  "source": "synthetic",
+  "generator": "c2_like",
+  "required_node_roles": [
+    {
+      "role": "host",
+      "node_type": "client"
+    },
+    {
+      "role": "c2",
+      "node_type": "external"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "host",
+      "destination": "c2",
+      "edge_type": "beacon",
+      "count": 40,
+      "interval_seconds": 60,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "c2",
+      "destination": "host",
+      "edge_type": "tasking",
+      "count": 3,
+      "interval_seconds": 600,
+      "start_offset_seconds": 70
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    }
+  ],
+  "optional_nodes": []
+}

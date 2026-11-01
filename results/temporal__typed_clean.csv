@@ -1,0 +1,5 @@
+method,tp,fp,tn,fn,precision,recall,f1,fpr,fnr,weights,threshold,dev_f1,n_test
+structure_only,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.4, ""temporal"": 0.2, ""frequency"": 0.1, ""contrastive"": 0.30000000000000004}",0.4,1.0,24
+structure+temporal,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.30000000000000004, ""frequency"": 0.1, ""contrastive"": 0.30000000000000004}",0.6,1.0,24
+structure+temporal+frequency,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24
+full,15,0,9,0,1.0,1.0,1.0,0.0,0.0,"{""structural"": 0.30000000000000004, ""temporal"": 0.2, ""frequency"": 0.2, ""contrastive"": 0.30000000000000004}",0.6,1.0,24

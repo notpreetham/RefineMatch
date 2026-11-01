@@ -1,0 +1,80 @@
+{
+  "pattern_id": "SUSP_SYN_001",
+  "name": "External-to-internal multi-hop chain (synthetic)",
+  "category": "suspicious",
+  "technique": "T1190 (analogy only)",
+  "description": "External source reaches an edge server, then hops inward to a database.",
+  "source": "synthetic",
+  "generator": "external_to_internal_chain",
+  "required_node_roles": [
+    {
+      "role": "ext",
+      "node_type": "external"
+    },
+    {
+      "role": "dmz",
+      "node_type": "server"
+    },
+    {
+      "role": "int1",
+      "node_type": "server"
+    },
+    {
+      "role": "int2",
+      "node_type": "server"
+    },
+    {
+      "role": "db",
+      "node_type": "database"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "ext",
+      "destination": "dmz",
+      "edge_type": "http_request",
+      "count": 5,
+      "interval_seconds": 30,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "dmz",
+      "destination": "int1",
+      "edge_type": "remote_exec",
+      "count": 3,
+      "interval_seconds": 60,
+      "start_offset_seconds": 40
+    },
+    {
+      "source": "int1",
+      "destination": "int2",
+      "edge_type": "remote_exec",
+      "count": 3,
+      "interval_seconds": 60,
+      "start_offset_seconds": 110
+    },
+    {
+      "source": "int2",
+      "destination": "db",
+      "edge_type": "sql_query",
+      "count": 4,
+      "interval_seconds": 45,
+      "start_offset_seconds": 180
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    },
+    {
+      "before_edge": 2,
+      "after_edge": 3
+    }
+  ],
+  "optional_nodes": []
+}

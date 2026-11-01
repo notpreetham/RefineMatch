@@ -1,0 +1,80 @@
+{
+  "pattern_id": "SUSP_SYN_002",
+  "name": "Lateral-movement-like host chain (synthetic)",
+  "category": "suspicious",
+  "technique": "T1021 (analogy only)",
+  "description": "A workstation logs into a host which logs into further hosts, ending at a file server.",
+  "source": "synthetic",
+  "generator": "lateral_movement_like",
+  "required_node_roles": [
+    {
+      "role": "ws",
+      "node_type": "client"
+    },
+    {
+      "role": "h1",
+      "node_type": "server"
+    },
+    {
+      "role": "h2",
+      "node_type": "server"
+    },
+    {
+      "role": "h3",
+      "node_type": "server"
+    },
+    {
+      "role": "fs",
+      "node_type": "fileserver"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "ws",
+      "destination": "h1",
+      "edge_type": "remote_login",
+      "count": 2,
+      "interval_seconds": 120,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "h1",
+      "destination": "h2",
+      "edge_type": "remote_login",
+      "count": 2,
+      "interval_seconds": 120,
+      "start_offset_seconds": 150
+    },
+    {
+      "source": "h2",
+      "destination": "h3",
+      "edge_type": "remote_login",
+      "count": 2,
+      "interval_seconds": 120,
+      "start_offset_seconds": 300
+    },
+    {
+      "source": "h3",
+      "destination": "fs",
+      "edge_type": "smb_access",
+      "count": 6,
+      "interval_seconds": 20,
+      "start_offset_seconds": 420
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    },
+    {
+      "before_edge": 2,
+      "after_edge": 3
+    }
+  ],
+  "optional_nodes": []
+}

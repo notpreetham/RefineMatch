@@ -1,0 +1,1642 @@
+{
+  "default_flag_threshold": 0.6,
+  "dev_seeds": [
+    100,
+    101
+  ],
+  "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+  "experiments": {
+    "ablation": {
+      "condition": "node types and event labels removed; 10% noise nodes; 20% timestamp and frequency perturbation",
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "name": "ablation",
+      "rows": [
+        {
+          "dev_f1": 0.8888888888888888,
+          "f1": 0.888888888888889,
+          "fn": 3,
+          "fnr": 0.2,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 0.125,
+          "mean_role_exact_matching_accuracy": 0.7268518518518517,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "full (CR+AGIR+temporal+frequency+contrastive)",
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 0.8,
+          "runtime_seconds_mean": 0.038146369583336316,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 12,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        {
+          "dev_f1": 0.8888888888888888,
+          "f1": 0.846153846153846,
+          "fn": 4,
+          "fnr": 0.26666666666666666,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 0.125,
+          "mean_role_exact_matching_accuracy": 0.7268518518518517,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "no_temporal",
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 0.7333333333333333,
+          "runtime_seconds_mean": 0.038146369583336316,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 11,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        {
+          "dev_f1": 0.8888888888888888,
+          "f1": 0.846153846153846,
+          "fn": 4,
+          "fnr": 0.26666666666666666,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 0.125,
+          "mean_role_exact_matching_accuracy": 0.7268518518518517,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "no_frequency",
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 0.7333333333333333,
+          "runtime_seconds_mean": 0.038146369583336316,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 11,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        {
+          "dev_f1": 1.0,
+          "f1": 0.9333333333333333,
+          "fn": 1,
+          "fnr": 0.06666666666666667,
+          "fp": 1,
+          "fpr": 0.1111111111111111,
+          "mean_individualizations": 0.125,
+          "mean_role_exact_matching_accuracy": 0.7268518518518517,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "no_contrastive",
+          "n_test": 24,
+          "precision": 0.9333333333333333,
+          "recall": 0.9333333333333333,
+          "runtime_seconds_mean": 0.038146369583336316,
+          "threshold": 0.7,
+          "tn": 8,
+          "tp": 14,
+          "weights": {
+            "contrastive": 0.2,
+            "frequency": 0.4,
+            "structural": 0.4,
+            "temporal": 0.0
+          }
+        },
+        {
+          "dev_f1": 0.8333333333333334,
+          "f1": 0.8235294117647058,
+          "fn": 1,
+          "fnr": 0.06666666666666667,
+          "fp": 5,
+          "fpr": 0.5555555555555556,
+          "mean_individualizations": 0.125,
+          "mean_role_exact_matching_accuracy": 0.7268518518518517,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "structure_only",
+          "n_test": 24,
+          "precision": 0.7368421052631579,
+          "recall": 0.9333333333333333,
+          "runtime_seconds_mean": 0.038146369583336316,
+          "threshold": 0.35,
+          "tn": 4,
+          "tp": 14,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.1,
+            "structural": 0.4,
+            "temporal": 0.2
+          }
+        },
+        {
+          "dev_f1": 0.8888888888888888,
+          "f1": 0.888888888888889,
+          "fn": 3,
+          "fnr": 0.2,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 0.0,
+          "mean_role_exact_matching_accuracy": 0.7527777777777778,
+          "mean_true_pattern_similarity": 0.9274755658436215,
+          "method": "no_agir (CR only, full scoring)",
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 0.8,
+          "runtime_seconds_mean": 0.011373646166669952,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 12,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        {
+          "dev_f1": 0.8888888888888888,
+          "f1": 0.888888888888889,
+          "fn": 3,
+          "fnr": 0.2,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 5.0,
+          "mean_role_exact_matching_accuracy": 0.7962962962962963,
+          "mean_true_pattern_similarity": 0.9678690843621398,
+          "method": "random_individualization (full scoring)",
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 0.8,
+          "runtime_seconds_mean": 0.0511026911666678,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 12,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        }
+      ]
+    },
+    "baselines": {
+      "baseline_notes": "graph2vec_style_wl is WL-subtree cosine similarity, not learned Graph2Vec; GED is size/time limited; the GNN baseline is not implemented.",
+      "conditions": {
+        "cross_env_typed": [
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "degree_statistics",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.0003258659166665012,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -0.15
+          },
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "color_refinement_only",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.003609252124999666,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -1.0
+          },
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "graph2vec_style_wl",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.0066382289166663595,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -0.95
+          },
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "graph_edit_distance",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 1.025675019625,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -0.35
+          },
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "cr_random_individualization",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.006492188458333696,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -1.0
+          },
+          {
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "refinematch_structure_only_margin",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.01168697587499897,
+            "status": "ok",
+            "tn": 9,
+            "tp": 15,
+            "tuned_margin": -1.0
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "refinematch_full",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010519936708334399,
+            "status": "ok",
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "unlabeled_noise_10": [
+          {
+            "f1": 0.7586206896551724,
+            "fn": 4,
+            "fnr": 0.26666666666666666,
+            "fp": 3,
+            "fpr": 0.3333333333333333,
+            "method": "degree_statistics",
+            "n_test": 24,
+            "precision": 0.7857142857142857,
+            "recall": 0.7333333333333333,
+            "runtime_seconds_mean": 0.0002855620416658174,
+            "status": "ok",
+            "tn": 6,
+            "tp": 11,
+            "tuned_margin": -0.05
+          },
+          {
+            "f1": 0.896551724137931,
+            "fn": 2,
+            "fnr": 0.13333333333333333,
+            "fp": 1,
+            "fpr": 0.1111111111111111,
+            "method": "color_refinement_only",
+            "n_test": 24,
+            "precision": 0.9285714285714286,
+            "recall": 0.8666666666666667,
+            "runtime_seconds_mean": 0.004096514166666528,
+            "status": "ok",
+            "tn": 8,
+            "tp": 13,
+            "tuned_margin": -0.15
+          },
+          {
+            "f1": 0.8571428571428571,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 1,
+            "fpr": 0.1111111111111111,
+            "method": "graph2vec_style_wl",
+            "n_test": 24,
+            "precision": 0.9230769230769231,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.0067285475833334845,
+            "status": "ok",
+            "tn": 8,
+            "tp": 12,
+            "tuned_margin": 0.05
+          },
+          {
+            "method": "graph_edit_distance",
+            "reason": "graph too large or no result within time limit",
+            "skipped_instances": 5,
+            "status": "skipped"
+          },
+          {
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "cr_random_individualization",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.04684454450000075,
+            "status": "ok",
+            "tn": 9,
+            "tp": 12,
+            "tuned_margin": 0.0
+          },
+          {
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "refinematch_structure_only_margin",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.04139998341666621,
+            "status": "ok",
+            "tn": 9,
+            "tp": 12,
+            "tuned_margin": 0.0
+          },
+          {
+            "dev_f1": 0.8888888888888888,
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "refinematch_full",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.04124027575000019,
+            "status": "ok",
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 12,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ]
+      },
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "name": "baseline_comparison"
+    },
+    "cross_env": {
+      "conditions": {
+        "node_types_known": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "method": "identifiers_only",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010870796916666,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8611111111111112,
+            "mean_true_pattern_similarity": 0.8976923166853722,
+            "method": "host_count_change",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.011165117916666153,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "method": "frequency_change",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010785981208333814,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 0.9655172413793104,
+            "fn": 1,
+            "fnr": 0.06666666666666667,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.875,
+            "mean_true_pattern_similarity": 0.8238644547325102,
+            "method": "benign_topology_noise",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "runtime_seconds_mean": 0.010431943208333294,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 14,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "node_types_removed": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "method": "identifiers_only",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.012093287458332824,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8611111111111112,
+            "mean_true_pattern_similarity": 0.8976923166853722,
+            "method": "host_count_change",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.018356072708333688,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "method": "frequency_change",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.012176460208333259,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 0.9655172413793104,
+            "fn": 1,
+            "fnr": 0.06666666666666667,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.875,
+            "mean_true_pattern_similarity": 0.8238644547325102,
+            "method": "benign_topology_noise",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.9333333333333333,
+            "runtime_seconds_mean": 0.014095404958334612,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 14,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ]
+      },
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "name": "cross_environment",
+      "note": "Both networks come from the same synthetic generator family; real cross-environment variation is larger."
+    },
+    "identity": {
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "name": "identity_robustness",
+      "note": "Role-exact accuracy is below 1 where automorphic nodes (e.g. identical servers) are interchangeable; structural similarity is unaffected by that choice.",
+      "summary": {
+        "anonymized_original": {
+          "max_abs_final_score_difference_vs_original": 0.0,
+          "mean_role_exact_matching_accuracy": 1.0,
+          "mean_true_pattern_similarity": 1.0,
+          "n": 24,
+          "same_best_attack_pattern_fraction": 1.0,
+          "same_risk_level_fraction": 1.0
+        },
+        "renamed_raw_ids": {
+          "max_abs_final_score_difference_vs_original": 0.0,
+          "mean_role_exact_matching_accuracy": 1.0,
+          "mean_true_pattern_similarity": 1.0,
+          "n": 24,
+          "same_best_attack_pattern_fraction": 1.0,
+          "same_risk_level_fraction": 1.0
+        },
+        "renamed_then_anonymized": {
+          "max_abs_final_score_difference_vs_original": 0.0,
+          "mean_role_exact_matching_accuracy": 1.0,
+          "mean_true_pattern_similarity": 1.0,
+          "n": 24,
+          "same_best_attack_pattern_fraction": 1.0,
+          "same_risk_level_fraction": 1.0
+        }
+      }
+    },
+    "individualization": {
+      "conditions": {
+        "typed_noise": [
+          {
+            "dev_f1": 0.8888888888888888,
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.6405092592592593,
+            "mean_true_pattern_similarity": 0.5667116769547326,
+            "method": "cr_only",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 13004,
+            "precision": 1.0,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.00684104125000277,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 12,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 0.8888888888888888,
+            "f1": 0.846153846153846,
+            "fn": 4,
+            "fnr": 0.26666666666666666,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 2.5,
+            "mean_role_exact_matching_accuracy": 0.6237268518518518,
+            "mean_true_pattern_similarity": 0.5462962962962963,
+            "method": "cr_random_individualization",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 15921,
+            "precision": 1.0,
+            "recall": 0.7333333333333333,
+            "runtime_seconds_mean": 0.008664067791667543,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 11,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 0.8888888888888888,
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.6405092592592593,
+            "mean_true_pattern_similarity": 0.5667116769547326,
+            "method": "cr_agir",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 14246,
+            "precision": 1.0,
+            "recall": 0.8,
+            "runtime_seconds_mean": 0.008484117958331558,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 12,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "untyped_unlabeled_noise": [
+          {
+            "dev_f1": 0.46153846153846156,
+            "f1": 0.4210526315789474,
+            "fn": 11,
+            "fnr": 0.7333333333333333,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.6145833333333334,
+            "mean_true_pattern_similarity": 0.6772936875367431,
+            "method": "cr_only",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 14105,
+            "precision": 1.0,
+            "recall": 0.26666666666666666,
+            "runtime_seconds_mean": 0.011823876541665612,
+            "threshold": 0.8,
+            "tn": 9,
+            "tp": 4,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 0.46153846153846156,
+            "f1": 0.4210526315789474,
+            "fn": 11,
+            "fnr": 0.7333333333333333,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 4.791666666666667,
+            "mean_role_exact_matching_accuracy": 0.6096064814814816,
+            "mean_true_pattern_similarity": 0.6566339653145209,
+            "method": "cr_random_individualization",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 16503,
+            "precision": 1.0,
+            "recall": 0.26666666666666666,
+            "runtime_seconds_mean": 0.048960429875001786,
+            "threshold": 0.8,
+            "tn": 9,
+            "tp": 4,
+            "weights": {
+              "contrastive": 0.2,
+              "frequency": 0.4,
+              "structural": 0.2,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 0.46153846153846156,
+            "f1": 0.4210526315789474,
+            "fn": 11,
+            "fnr": 0.7333333333333333,
+            "fp": 0,
+            "fpr": 0.0,
+            "mean_individualizations": 0.125,
+            "mean_role_exact_matching_accuracy": 0.6145833333333334,
+            "mean_true_pattern_similarity": 0.6772936875367431,
+            "method": "cr_agir",
+            "n_test": 24,
+            "peak_memory_bytes_one_match": 16027,
+            "precision": 1.0,
+            "recall": 0.26666666666666666,
+            "runtime_seconds_mean": 0.03330879658333193,
+            "threshold": 0.8,
+            "tn": 9,
+            "tp": 4,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ]
+      },
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "mutations": [
+        {
+          "percentage": 0.2,
+          "type": "insert_benign_nodes"
+        },
+        {
+          "percentage": 0.1,
+          "type": "delete_edges"
+        }
+      ],
+      "name": "cr_vs_individualization"
+    },
+    "mutation": {
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "frozen_weights_tuned_on": "clean development seeds",
+      "levels": [
+        0.05,
+        0.1,
+        0.2,
+        0.3
+      ],
+      "name": "mutation_robustness",
+      "note": "delete_edges at 0.1 and 0.2 are the '10%/20% missing edges' cases.",
+      "results": {
+        "clean": {
+          "dev_f1": 1.0,
+          "f1": 1.0,
+          "fn": 0,
+          "fnr": 0.0,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 1.0,
+          "mean_role_exact_matching_accuracy": 1.0,
+          "mean_true_pattern_similarity": 1.0,
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 1.0,
+          "runtime_seconds_mean": 0.011022001916665877,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 15,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        "delete_edges": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.05,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8875000000000001,
+            "mean_true_pattern_similarity": 0.6818576388888888,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.00909881683333443,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.1,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8875000000000001,
+            "mean_true_pattern_similarity": 0.6818576388888888,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010257369541666487,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.2,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.869642857142857,
+            "mean_true_pattern_similarity": 0.6666666666666666,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.008388952500000121,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.3,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8092261904761905,
+            "mean_true_pattern_similarity": 0.6097222222222222,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.008929157708333099,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "identity_change_only": {
+          "dev_f1": 1.0,
+          "f1": 1.0,
+          "fn": 0,
+          "fnr": 0.0,
+          "fp": 0,
+          "fpr": 0.0,
+          "mean_individualizations": 1.0,
+          "mean_role_exact_matching_accuracy": 1.0,
+          "mean_true_pattern_similarity": 1.0,
+          "n_test": 24,
+          "precision": 1.0,
+          "recall": 1.0,
+          "runtime_seconds_mean": 0.009561296333332692,
+          "threshold": 0.6,
+          "tn": 9,
+          "tp": 15,
+          "weights": {
+            "contrastive": 0.30000000000000004,
+            "frequency": 0.2,
+            "structural": 0.30000000000000004,
+            "temporal": 0.2
+          }
+        },
+        "insert_benign_nodes": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.05,
+            "mean_individualizations": 0.25,
+            "mean_role_exact_matching_accuracy": 0.9138888888888889,
+            "mean_true_pattern_similarity": 0.9678690843621398,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010508085625000163,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.1,
+            "mean_individualizations": 0.25,
+            "mean_role_exact_matching_accuracy": 0.9138888888888889,
+            "mean_true_pattern_similarity": 0.9678690843621398,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.012275931333334711,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.2,
+            "mean_individualizations": 0.16666666666666666,
+            "mean_role_exact_matching_accuracy": 0.937037037037037,
+            "mean_true_pattern_similarity": 0.9660300925925925,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.01040059591666657,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.3,
+            "mean_individualizations": 0.0,
+            "mean_role_exact_matching_accuracy": 0.8703703703703703,
+            "mean_true_pattern_similarity": 0.9037687055742611,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.009339143833335228,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "perturb_frequency": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.05,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.008964694416668214,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.1,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.00979044716666877,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.2,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.009432397499999468,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.3,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.012169399666667266,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "perturb_timestamps": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.05,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.011183689833332622,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.1,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 1.0,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.010058503791665174,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.2,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 0.9833333333333334,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.013244796708335116,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "level": 0.3,
+            "mean_individualizations": 1.0,
+            "mean_role_exact_matching_accuracy": 0.9833333333333334,
+            "mean_true_pattern_similarity": 1.0,
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "runtime_seconds_mean": 0.008921907416667688,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ]
+      },
+      "robustness_curves_true_pattern_similarity": {
+        "delete_edges": [
+          {
+            "level": 0.05,
+            "max": 0.8784722222222222,
+            "mean": 0.6818576388888888,
+            "min": 0.425,
+            "n": 24,
+            "std": 0.12962900635907537
+          },
+          {
+            "level": 0.1,
+            "max": 0.8784722222222222,
+            "mean": 0.6818576388888888,
+            "min": 0.425,
+            "n": 24,
+            "std": 0.12962900635907537
+          },
+          {
+            "level": 0.2,
+            "max": 0.7833333333333333,
+            "mean": 0.6666666666666666,
+            "min": 0.425,
+            "n": 24,
+            "std": 0.11155942542535151
+          },
+          {
+            "level": 0.3,
+            "max": 0.7638888888888888,
+            "mean": 0.6097222222222222,
+            "min": 0.2833333333333333,
+            "n": 24,
+            "std": 0.15932165955608074
+          }
+        ],
+        "insert_benign_nodes": [
+          {
+            "level": 0.05,
+            "max": 0.9861111111111112,
+            "mean": 0.9678690843621398,
+            "min": 0.9305555555555556,
+            "n": 24,
+            "std": 0.013577906992946129
+          },
+          {
+            "level": 0.1,
+            "max": 0.9861111111111112,
+            "mean": 0.9678690843621398,
+            "min": 0.9305555555555556,
+            "n": 24,
+            "std": 0.013577906992946129
+          },
+          {
+            "level": 0.2,
+            "max": 0.9833333333333333,
+            "mean": 0.9660300925925925,
+            "min": 0.9305555555555556,
+            "n": 24,
+            "std": 0.012448318874040007
+          },
+          {
+            "level": 0.3,
+            "max": 0.9785353535353536,
+            "mean": 0.9037687055742611,
+            "min": 0.55,
+            "n": 24,
+            "std": 0.10580970628775932
+          }
+        ],
+        "perturb_frequency": [
+          {
+            "level": 0.05,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.1,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.2,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.3,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          }
+        ],
+        "perturb_timestamps": [
+          {
+            "level": 0.05,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.1,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.2,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          },
+          {
+            "level": 0.3,
+            "max": 1.0,
+            "mean": 1.0,
+            "min": 1.0,
+            "n": 24,
+            "std": 0.0
+          }
+        ]
+      }
+    },
+    "temporal": {
+      "conditions": {
+        "typed_clean": [
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "structure_only",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "threshold": 0.4,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.1,
+              "structural": 0.4,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "structure+temporal",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.1,
+              "structural": 0.30000000000000004,
+              "temporal": 0.30000000000000004
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "structure+temporal+frequency",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 1.0,
+            "f1": 1.0,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "full",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 1.0,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ],
+        "unlabeled_perturbed": [
+          {
+            "dev_f1": 0.9090909090909091,
+            "f1": 0.9090909090909091,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 3,
+            "fpr": 0.3333333333333333,
+            "method": "structure_only",
+            "n_test": 24,
+            "precision": 0.8333333333333334,
+            "recall": 1.0,
+            "threshold": 0.4,
+            "tn": 6,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.1,
+              "structural": 0.4,
+              "temporal": 0.2
+            }
+          },
+          {
+            "dev_f1": 0.9090909090909091,
+            "f1": 0.9090909090909091,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 3,
+            "fpr": 0.3333333333333333,
+            "method": "structure+temporal",
+            "n_test": 24,
+            "precision": 0.8333333333333334,
+            "recall": 1.0,
+            "threshold": 0.6,
+            "tn": 6,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.1,
+              "structural": 0.30000000000000004,
+              "temporal": 0.30000000000000004
+            }
+          },
+          {
+            "dev_f1": 0.9523809523809523,
+            "f1": 0.967741935483871,
+            "fn": 0,
+            "fnr": 0.0,
+            "fp": 1,
+            "fpr": 0.1111111111111111,
+            "method": "structure+temporal+frequency",
+            "n_test": 24,
+            "precision": 0.9375,
+            "recall": 1.0,
+            "threshold": 0.65,
+            "tn": 8,
+            "tp": 15,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.30000000000000004,
+              "structural": 0.30000000000000004,
+              "temporal": 0.1
+            }
+          },
+          {
+            "dev_f1": 0.8888888888888888,
+            "f1": 0.888888888888889,
+            "fn": 3,
+            "fnr": 0.2,
+            "fp": 0,
+            "fpr": 0.0,
+            "method": "full",
+            "n_test": 24,
+            "precision": 1.0,
+            "recall": 0.8,
+            "threshold": 0.6,
+            "tn": 9,
+            "tp": 12,
+            "weights": {
+              "contrastive": 0.30000000000000004,
+              "frequency": 0.2,
+              "structural": 0.30000000000000004,
+              "temporal": 0.2
+            }
+          }
+        ]
+      },
+      "disclaimer": "Synthetic-data demonstration only. Not evidence of real-world performance; no real public dataset was evaluated.",
+      "name": "temporal_contribution",
+      "note": "'unlabeled_perturbed' removes node types and event-type labels, so structure alone cannot separate benign and suspicious shapes that share a topology (e.g. client-server vs beaconing); temporal/frequency evidence is what remains."
+    }
+  },
+  "quick_mode": false,
+  "test_seeds": [
+    200,
+    201,
+    202
+  ]
+}

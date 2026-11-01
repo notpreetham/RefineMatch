@@ -1,0 +1,80 @@
+{
+  "pattern_id": "SUSP_SYN_005",
+  "name": "Data-staging-like fan-in then upload (synthetic)",
+  "category": "suspicious",
+  "technique": "T1074/T1041 (analogy only)",
+  "description": "Several hosts send files to one staging host, which uploads externally.",
+  "source": "synthetic",
+  "generator": "data_staging_like",
+  "required_node_roles": [
+    {
+      "role": "src1",
+      "node_type": "client"
+    },
+    {
+      "role": "src2",
+      "node_type": "client"
+    },
+    {
+      "role": "src3",
+      "node_type": "client"
+    },
+    {
+      "role": "stage",
+      "node_type": "server"
+    },
+    {
+      "role": "ext",
+      "node_type": "external"
+    }
+  ],
+  "required_edges": [
+    {
+      "source": "src1",
+      "destination": "stage",
+      "edge_type": "file_transfer",
+      "count": 5,
+      "interval_seconds": 30,
+      "start_offset_seconds": 0
+    },
+    {
+      "source": "src2",
+      "destination": "stage",
+      "edge_type": "file_transfer",
+      "count": 5,
+      "interval_seconds": 30,
+      "start_offset_seconds": 15
+    },
+    {
+      "source": "src3",
+      "destination": "stage",
+      "edge_type": "file_transfer",
+      "count": 5,
+      "interval_seconds": 30,
+      "start_offset_seconds": 30
+    },
+    {
+      "source": "stage",
+      "destination": "ext",
+      "edge_type": "bulk_upload",
+      "count": 4,
+      "interval_seconds": 20,
+      "start_offset_seconds": 200
+    }
+  ],
+  "temporal_constraints": [
+    {
+      "before_edge": 0,
+      "after_edge": 1
+    },
+    {
+      "before_edge": 1,
+      "after_edge": 2
+    },
+    {
+      "before_edge": 2,
+      "after_edge": 3
+    }
+  ],
+  "optional_nodes": []
+}
