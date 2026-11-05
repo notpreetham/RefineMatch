@@ -1,0 +1,28 @@
+======================================================
+RefineMatch: Setup and Execution Guide
+======================================================
+
+1. GET THE LATEST CODE
+Make sure you are on the correct branch that contains the V2 dashboard:
+git checkout feature/dashboard-ui
+git pull origin feature/dashboard-ui
+
+2. SETUP PYTHON ENVIRONMENT
+Ensure you have Python 3.12 installed. Install the required backend packages:
+python -m pip install fastapi uvicorn networkx scipy numpy pytest python-multipart
+
+3. ADD THE DATASET
+Download the DARPA/StreamSpot dataset (all.tsv).
+Place it exactly in this directory structure:
+data/streamspot/all.tsv
+
+4. RUN THE DASHBOARD SERVER
+From the root 'RefineMatch' folder, start the FastAPI server:
+python dashboard/server.py
+
+5. VIEW THE APP
+Open your web browser (Chrome/Edge/Firefox) and navigate to:
+http://127.0.0.1:8000
+
+* Note: You do NOT need to run 'npm install' or 'npm run dev' for the frontend. 
+The React application is already compiled in the repository and served directly by the Python backend!
