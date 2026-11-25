@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;450;500;550;600;650;700;750;800&family=JetBrains+Mono:wght@400;450;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;450;500;550;600;650;700;750;800&family=JetBrains+Mono:wght@400;450;500;600&display=swap');
 @import 'tailwindcss';
 
 @theme {
@@ -6,8 +6,9 @@
   --color-surface: #0f172a;
   --color-border: #1e293b;
   --color-mint: #14b8a6;
-  --font-sans: 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'DM Serif Display', Georgia, serif;
+  --font-sans: 'DM Sans', 'Inter', sans-serif;
+  --font-mono: 'DM Mono', 'JetBrains Mono', monospace;
 }
 @layer base {
   :root {font-family:var(--font-sans);color:#dce5ef;background:#090d14;font-synthesis:none;--mint:#14b8a6;--violet:#06b6d4;--teal:#14b8a6;--amber:#f59e0b;--blue:#60a5fa;--rose:#ef4444;--muted:#7e899c;--line:#1e293b;--canvas:#090d14;--surface:#0f172a;--border:#1e293b;--text-primary:#f8fafc;--text-secondary:#94a3b8;--accent-cyan:#06b6d4;--accent-teal:#14b8a6;--danger:#ef4444;--warning:#f59e0b}

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode, type CSSProperties } from "react"
+import { useEffect, useState, useMemo, type ReactNode, type CSSProperties } from "react"
 
 type IconName = "grid" | "graph" | "shield" | "activity" | "layers" | "settings" | "help" | "chevron" | "arrow" | "download" | "check" | "clock" | "external" | "close" | "filter" | "plus" | "minus" | "fit" | "process" | "file" | "socket" | "host" | "search" | "bell" | "pause" | "play" | "code" | "copy" | "eye" | "spark" | "target"
 function Icon({
@@ -215,6 +215,30 @@ export type RankedMatch = {
   coverage: number
 }
 
+export type GraphNodeData = {
+  id: string
+  label: string
+  type: IconName
+  color: string
+  is_matched?: boolean
+  mapped_to?: string | null
+  mapped_from?: string | null
+  ref_index?: number
+  desc?: string
+}
+
+export type GraphEdgeData = {
+  source: string
+  target: string
+  label: string
+  is_matched?: boolean
+}
+
+export type GraphPayload = {
+  nodes: GraphNodeData[]
+  edges: GraphEdgeData[]
+}
+
 const defaultNodes: MappedNode[] = [
   {
     id: "proc_101",
@@ -262,19 +286,38 @@ const defaultNodes: MappedNode[] = [
   },
 ]
 const nodes = defaultNodes
-const reference = [
-  { x: 247, y: 75 },
-  { x: 116, y: 193 },
-  { x: 380, y: 193 },
-  { x: 247, y: 298 },
-]
-const observed = [
-  { x: 328, y: 75 },
-  { x: 200, y: 193 },
-  { x: 462, y: 193 },
-  { x: 328, y: 298 },
-]
-const noise = Array.from({ length: 49 }, (_, i) => {
+
+const defaultRefGraph: GraphPayload = {
+  nodes: [
+    { id: "proc_101", label: "Process", type: "process", color: "violet", is_matched: true, mapped_to: "N_0001", ref_index: 0 },
+    { id: "file_201", label: "File", type: "file", color: "teal", is_matched: true, mapped_to: "N_0002", ref_index: 1 },
+    { id: "sock_301", label: "Socket", type: "socket", color: "amber", is_matched: true, mapped_to: "N_0003", ref_index: 2 },
+    { id: "host_401", label: "Host", type: "host", color: "blue", is_matched: true, mapped_to: "N_0004", ref_index: 3 },
+  ],
+  edges: [
+    { source: "proc_101", target: "file_201", label: "read", is_matched: true },
+    { source: "proc_101", target: "sock_301", label: "connect", is_matched: true },
+    { source: "file_201", target: "host_401", label: "write", is_matched: true },
+    { source: "sock_301", target: "host_401", label: "sendto", is_matched: true },
+  ],
+}
+
+const defaultObsGraph: GraphPayload = {
+  nodes: [
+    { id: "N_0001", label: "Process", type: "process", color: "violet", is_matched: true, mapped_from: "proc_101", ref_index: 0 },
+    { id: "N_0002", label: "File", type: "file", color: "teal", is_matched: true, mapped_from: "file_201", ref_index: 1 },
+    { id: "N_0003", label: "Socket", type: "socket", color: "amber", is_matched: true, mapped_from: "sock_301", ref_index: 2 },
+    { id: "N_0004", label: "Host", type: "host", color: "blue", is_matched: true, mapped_from: "host_401", ref_index: 3 },
+  ],
+  edges: [
+    { source: "N_0001", target: "N_0002", label: "read", is_matched: true },
+    { source: "N_0001", target: "N_0003", label: "connect", is_matched: true },
+    { source: "N_0002", target: "N_0004", label: "write", is_matched: true },
+    { source: "N_0003", target: "N_0004", label: "sendto", is_matched: true },
+  ],
+}
+
+const noise = Array.from({ length: 42 }, (_, i) => {
   const angle = i * 2.39996
   const radius = 125 + ((i * 37) % 115)
   return {
@@ -282,6 +325,88 @@ const noise = Array.from({ length: 49 }, (_, i) => {
     y: 188 + Math.sin(angle) * radius * 0.68,
   }
 })
+
+function computeGraphLayout(
+  nodes: GraphNodeData[],
+  width: number,
+  height: number,
+  isEnterprise: boolean,
+): { x: number; y: number }[] {
+  const cx = isEnterprise ? 330 : 250
+  const cy = 185
+  const count = nodes.length
+  if (count === 0) return []
+  if (count === 1) return [{ x: cx, y: cy }]
+  if (count === 2) {
+    return [
+      { x: cx - 110, y: cy },
+      { x: cx + 110, y: cy },
+    ]
+  }
+  if (count === 3) {
+    return [
+      { x: cx, y: cy - 90 },
+      { x: cx - 120, y: cy + 70 },
+      { x: cx + 120, y: cy + 70 },
+    ]
+  }
+  if (count === 4) {
+    return [
+      { x: cx, y: cy - 105 },
+      { x: cx - 135, y: cy },
+      { x: cx + 135, y: cy },
+      { x: cx, y: cy + 105 },
+    ]
+  }
+
+  const matchedIndices: number[] = []
+  const unmatchedIndices: number[] = []
+  nodes.forEach((n, idx) => {
+    if (n.is_matched || n.mapped_to || n.mapped_from) {
+      matchedIndices.push(idx)
+    } else {
+      unmatchedIndices.push(idx)
+    }
+  })
+
+  const coords: { x: number; y: number }[] = new Array(count).fill(null).map(() => ({ x: cx, y: cy }))
+
+  if (matchedIndices.length > 0 && unmatchedIndices.length > 0) {
+    const mCount = matchedIndices.length
+    const rxM = Math.min(cx - 70, 140)
+    const ryM = 95
+    matchedIndices.forEach((nodeIdx, k) => {
+      const angle = (2 * Math.PI * k) / mCount - Math.PI / 2
+      coords[nodeIdx] = {
+        x: cx + rxM * Math.cos(angle),
+        y: cy + ryM * Math.sin(angle),
+      }
+    })
+
+    const uCount = unmatchedIndices.length
+    const rxU = Math.min(cx - 40, 225)
+    const ryU = 145
+    unmatchedIndices.forEach((nodeIdx, k) => {
+      const angle = (2 * Math.PI * (k + 0.5)) / uCount - Math.PI / 2
+      coords[nodeIdx] = {
+        x: cx + rxU * Math.cos(angle),
+        y: cy + ryU * Math.sin(angle),
+      }
+    })
+  } else {
+    const rx = Math.min(cx - 60, 185)
+    const ry = 120
+    nodes.forEach((_, k) => {
+      const angle = (2 * Math.PI * k) / count - Math.PI / 2
+      coords[k] = {
+        x: cx + rx * Math.cos(angle),
+        y: cy + ry * Math.sin(angle),
+      }
+    })
+  }
+
+  return coords
+}
 
 type CanvasPosition = {
   x: number
@@ -298,6 +423,8 @@ function Graph({
   zoom,
   pan,
   setPan,
+  graphData,
+  matchedCount = 4,
 }: {
   enterprise: boolean
   mode: string
@@ -308,18 +435,36 @@ function Graph({
   zoom: number
   pan: CanvasPosition
   setPan: (p: CanvasPosition) => void
+  graphData?: GraphPayload
+  matchedCount?: number
 }) {
-  const points = enterprise ? observed : reference
+  const currentGraph = graphData && graphData.nodes?.length ? graphData : (enterprise ? defaultObsGraph : defaultRefGraph)
+  const gNodes = currentGraph.nodes || []
+  const gEdges = currentGraph.edges || []
+  const width = enterprise ? 660 : 500
+  const height = 370
+
+  const points = useMemo(() => {
+    return computeGraphLayout(gNodes, width, height, enterprise)
+  }, [gNodes, width, height, enterprise])
+
+  const nodeIdToIndex = useMemo(() => {
+    const map = new Map<string, number>()
+    gNodes.forEach((n, idx) => map.set(String(n.id), idx))
+    return map
+  }, [gNodes])
+
   const [drag, setDrag] = useState<{
     x: number
     y: number
     px: number
     py: number
   } | null>(null)
+
   return (
     <svg
       className="graph-svg"
-      viewBox={`0 0 ${enterprise ? 660 : 500} 370`}
+      viewBox={`0 0 ${width} ${height}`}
       aria-label={
         enterprise
           ? "Observed enterprise telemetry graph"
@@ -400,13 +545,13 @@ function Graph({
                   x1={n.x}
                   y1={n.y}
                   x2={
-                    i % 3 === 0
-                      ? points[i % 4].x
+                    points.length > 0
+                      ? points[i % points.length].x
                       : noise[(i + 7) % noise.length].x
                   }
                   y2={
-                    i % 3 === 0
-                      ? points[i % 4].y
+                    points.length > 0
+                      ? points[i % points.length].y
                       : noise[(i + 7) % noise.length].y
                   }
                 />
@@ -420,31 +565,37 @@ function Graph({
             ))}
           </g>
         )}
-        {[
-          [0, 1, "read"],
-          [0, 2, "connect"],
-          [1, 3, "write"],
-          [2, 3, "sendto"],
-        ].map(([a, b, label], i) => {
-          const p = points[Number(a)],
-            q = points[Number(b)],
-            dx = q.x - p.x,
-            dy = q.y - p.y,
-            len = Math.sqrt(dx * dx + dy * dy)
+        {gEdges.map((edge, i) => {
+          const sIdx = nodeIdToIndex.get(String(edge.source))
+          const tIdx = nodeIdToIndex.get(String(edge.target))
+          if (sIdx === undefined || tIdx === undefined) return null
+          const p = points[sIdx]
+          const q = points[tIdx]
+          if (!p || !q) return null
+          const dx = q.x - p.x
+          const dy = q.y - p.y
+          const len = Math.max(Math.sqrt(dx * dx + dy * dy), 1)
+          const sNode = gNodes[sIdx]
+          const tNode = gNodes[tIdx]
+          const isDim =
+            active !== null &&
+            sIdx !== active &&
+            tIdx !== active &&
+            sNode?.ref_index !== active &&
+            tNode?.ref_index !== active
+
           return (
             <g
-              key={i}
-              className={`graph-edge ${enterprise ? "matched-edge" : ""} ${
-                active !== null && Number(a) !== active && Number(b) !== active
-                  ? "dim"
-                  : ""
+              key={`edge-${i}-${edge.source}-${edge.target}`}
+              className={`graph-edge ${enterprise && edge.is_matched ? "matched-edge" : ""} ${
+                isDim ? "dim" : ""
               }`}
             >
               <line
-                x1={p.x + (dx / len) * 30}
-                y1={p.y + (dy / len) * 30}
-                x2={q.x - (dx / len) * 33}
-                y2={q.y - (dy / len) * 33}
+                x1={p.x + (dx / len) * 28}
+                y1={p.y + (dy / len) * 28}
+                x2={q.x - (dx / len) * 31}
+                y2={q.y - (dy / len) * 31}
                 markerEnd={`url(#arrow-${enterprise})`}
               />
               <rect
@@ -459,7 +610,7 @@ function Graph({
                 y={(p.y + q.y) / 2 + 3}
                 textAnchor="middle"
               >
-                {label}
+                {edge.label}
               </text>
             </g>
           )
@@ -467,48 +618,53 @@ function Graph({
         {mode === "Overlay mode" &&
           enterprise &&
           points.map((p, i) => {
-            const n = nodes[i] || defaultNodes[i % defaultNodes.length]
+            const n = gNodes[i]
+            if (!n || !n.is_matched) return null
             return (
               <circle
                 key={`overlay${i}`}
                 cx={p.x - 9}
                 cy={p.y - 5}
                 r="28"
-                stroke={`var(--${n.color})`}
+                stroke={`var(--${n.color || "teal"})`}
                 fill="none"
                 strokeDasharray="4 4"
                 opacity=".65"
               />
             )
           })}
-        {points.map((p, i) => {
-          const n = nodes[i] || defaultNodes[i % defaultNodes.length]
+        {gNodes.map((n, i) => {
+          const p = points[i]
+          if (!p) return null
+          const refIndex = enterprise
+            ? (n.ref_index !== undefined ? n.ref_index : (n.is_matched ? i : -1))
+            : i
+          const isActive = active === i || (active !== null && refIndex === active)
+
           return (
             <g
-              key={i}
-              data-node-index={i}
+              key={`node-${i}-${n.id}`}
+              data-node-index={refIndex >= 0 ? refIndex : i}
               className={`graph-node ${enterprise ? "observed-node" : ""} ${
-                active === i ? "node-active" : ""
+                isActive ? "node-active" : ""
               } ${
-                active !== null && active !== i ? "dim" : ""
-              } ${n.color}`}
+                active !== null && !isActive ? "dim" : ""
+              } ${n.color || "blue"}`}
               style={
-                { "--node-color": `var(--${n.color})` } as CSSProperties
+                { "--node-color": `var(--${n.color || "blue"})` } as CSSProperties
               }
-              onMouseEnter={() => setActive(i)}
+              onMouseEnter={() => setActive(refIndex >= 0 ? refIndex : i)}
               onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(i)}
+              onFocus={() => setActive(refIndex >= 0 ? refIndex : i)}
               onBlur={() => setActive(null)}
-              onClick={() => inspect(i)}
+              onClick={() => inspect(refIndex >= 0 ? refIndex : i)}
               role="button"
               tabIndex={0}
-              aria-label={`Inspect ${
-                enterprise ? n.observed : n.id
-              }`}
+              aria-label={`Inspect ${n.id}`}
               onKeyDown={(e) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault()
-                  inspect(i)
+                  inspect(refIndex >= 0 ? refIndex : i)
                 }
               }}
             >
@@ -522,9 +678,9 @@ function Graph({
               <circle className="node-outer" cx={p.x} cy={p.y} r="29" />
               <circle className="node-inner" cx={p.x} cy={p.y} r="23" />
               <foreignObject x={p.x - 11} y={p.y - 11} width="22" height="22">
-                <Icon name={n.type} size={22} />
+                <Icon name={n.type || "graph"} size={22} />
               </foreignObject>
-              {enterprise && (
+              {enterprise && n.is_matched && (
                 <g>
                   <circle
                     cx={p.x + 21}
@@ -546,7 +702,7 @@ function Graph({
                 y={p.y + 47}
                 textAnchor="middle"
               >
-                {enterprise ? n.observed : n.id}
+                {n.id}
               </text>
               <text
                 className="node-type"
@@ -554,19 +710,19 @@ function Graph({
                 y={p.y + 62}
                 textAnchor="middle"
               >
-                {enterprise ? n.desc : n.label.toLowerCase()}
+                {n.label || "entity"}
               </text>
             </g>
           )
         })}
-        {enterprise && (
+        {enterprise && matchedCount > 0 && (
           <g className="match-callout">
-            <rect x="484" y="46" width="124" height="35" rx="5" />
-            <circle cx="498" cy="63" r="3" />
-            <text x="509" y="67">
-              4 exact node pairs
+            <rect x="470" y="46" width="145" height="35" rx="5" />
+            <circle cx="484" cy="63" r="3" />
+            <text x="495" y="67">
+              {matchedCount} exact node pairs
             </text>
-            <path d="M484 64h-90l-30 6" />
+            <path d="M470 64h-75l-25 6" />
           </g>
         )}
       </g>
@@ -618,6 +774,10 @@ export default function App() {
     threat_name?: string
     signature_id?: string
     description?: string
+    ref_graph?: GraphPayload
+    obs_graph?: GraphPayload
+    ref_graph_id?: string
+    obs_graph_id?: string
   }>({
     similarity_score: 0.9965,
     reference_coverage: 1.0,
@@ -629,6 +789,8 @@ export default function App() {
     threat_name: "Drive-by Download & In-Memory Code Injection",
     signature_id: "SUSP_SYN_003",
     description: "Multi-stage provenance threat sequence matched against telemetry log.",
+    ref_graph: defaultRefGraph,
+    obs_graph: defaultObsGraph,
   })
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -656,7 +818,10 @@ export default function App() {
       const right = canvas.querySelector(
         `.telemetry-viewport [data-node-index="${active}"] .node-inner`,
       )
-      if (!left || !right) return
+      if (!left || !right) {
+        setBridge(null)
+        return
+      }
       const bounds = canvas.getBoundingClientRect()
       const a = left.getBoundingClientRect()
       const b = right.getBoundingClientRect()
@@ -671,7 +836,7 @@ export default function App() {
     const observer = new ResizeObserver(updateBridge)
     observer.observe(canvas)
     return () => observer.disconnect()
-  }, [active, view, collapsed, zoom, pan])
+  }, [active, view, collapsed, zoom, pan, matchData])
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (
@@ -766,6 +931,26 @@ export default function App() {
       }
 
       if (data && data.status === "success") {
+        const processedRefGraph = data.ref_graph as GraphPayload | undefined
+        const processedObsGraph = data.obs_graph as GraphPayload | undefined
+
+        if (processedRefGraph && processedObsGraph && Array.isArray(processedRefGraph.nodes)) {
+          const refIdToIdx = new Map<string, number>()
+          processedRefGraph.nodes.forEach((rn: GraphNodeData, idx: number) => {
+            refIdToIdx.set(String(rn.id), idx)
+            rn.ref_index = idx
+          })
+
+          if (Array.isArray(processedObsGraph.nodes)) {
+            processedObsGraph.nodes.forEach((on: GraphNodeData) => {
+              if (on.mapped_from && refIdToIdx.has(String(on.mapped_from))) {
+                on.ref_index = refIdToIdx.get(String(on.mapped_from))
+                on.is_matched = true
+              }
+            })
+          }
+        }
+
         setMatchData({
           similarity_score: Number(data.similarity_score ?? 0.9965),
           reference_coverage: Number(data.reference_coverage ?? 1.0),
@@ -777,6 +962,10 @@ export default function App() {
           threat_name: data.threat_name,
           signature_id: data.signature_id,
           description: data.description,
+          ref_graph: processedRefGraph || defaultRefGraph,
+          obs_graph: processedObsGraph || defaultObsGraph,
+          ref_graph_id: data.ref_graph_id,
+          obs_graph_id: data.obs_graph_id,
         })
         if (Array.isArray(data.ranked_matches)) {
           setRankedMatches(data.ranked_matches)
@@ -1660,9 +1849,11 @@ export default function App() {
                         <div>
                           <span className="viewport-dot violet-dot" />
                           <strong>Reference Signature</strong>
-                          <span className="mono">SUSP_SYN_003</span>
+                          <span className="mono">{matchData.signature_id || "SUSP_SYN_003"}</span>
                         </div>
-                        <Tag className="muted-tag">4 nodes · 4 edges</Tag>
+                        <Tag className="muted-tag">
+                          {matchData.ref_graph?.nodes?.length ?? 4} nodes · {matchData.ref_graph?.edges?.length ?? 4} edges
+                        </Tag>
                       </div>
                       <Graph
                         enterprise={false}
@@ -1674,6 +1865,8 @@ export default function App() {
                         zoom={zoom}
                         pan={pan}
                         setPan={setPan}
+                        graphData={matchData.ref_graph}
+                        matchedCount={matchData.matched_nodes_count}
                       />
                       <div className="canvas-caption">
                         <Icon name="shield" size={12} />
@@ -1691,9 +1884,15 @@ export default function App() {
                             ? "Signature overlay"
                             : "Observed Telemetry"}
                         </strong>
-                        <span className="mono">all.tsv</span>
+                        <span className="mono">
+                          {selectedFile
+                            ? selectedFile.name
+                            : matchData.obs_graph_id
+                            ? `Graph ${matchData.obs_graph_id}`
+                            : "all.tsv"}
+                        </span>
                       </div>
-                      <Tag className="muted-tag">8,295 events</Tag>
+                      <Tag className="muted-tag">{matchData.total_events.toLocaleString()} events</Tag>
                     </div>
                     <Graph
                       enterprise={true}
@@ -1705,6 +1904,8 @@ export default function App() {
                       zoom={zoom}
                       pan={pan}
                       setPan={setPan}
+                      graphData={matchData.obs_graph}
+                      matchedCount={matchData.matched_nodes_count}
                     />
                     <div className="canvas-caption">
                       <span className="small-dot cyan" />

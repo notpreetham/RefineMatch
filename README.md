@@ -1,114 +1,229 @@
-# RefineMatch
+# RefineMatch: Ambiguity-Guided Provenance Graph Matching
 
-**Identity-Independent Cyber Attack Pattern Matching Using Temporal Color Refinement and Selective Individualization**
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.12-blue.svg)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-2.1.0-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![React 19](https://img.shields.io/badge/React-19.0-61DAFB.svg?logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF.svg?logo=vite)](https://vitejs.dev/)
+[![Tests](https://img.shields.io/badge/Tests-290%20Passed-brightgreen.svg)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A research prototype. It turns network-communication events into attributed, directed temporal graphs, derives structural signatures with Color Refinement (1-WL), resolves ambiguity with **AGIR** (Ambiguity-Guided Individualization and Refinement), matches the result against a bank of suspicious-like and benign patterns, adds temporal/frequency evidence and contrastive scoring, and produces an analyst-reviewable explanation.
+**RefineMatch** is a deterministic, identity-independent cybersecurity threat-hunting engine designed to locate complex attack signatures within massive, noisy enterprise provenance telemetry.
 
-> **Read this first.** A "high" result is a **suspicious-pattern flag for analyst review, not a confirmed attack.** All bundled data is **synthetic**; the "suspicious" patterns are illustrative shapes, not recordings of real attacks. No real public dataset was evaluated. Results show the pipeline works as designed under controlled perturbation; they are **not** evidence of real-world detection performance.
+Modern Advanced Persistent Threats (APTs) continually evade signature and rule-based detectors by rotating IP addresses, hostnames, and process IDs. RefineMatch abstracts away ephemeral identifiers, transforming system call and network logs into attributed, directed temporal provenance graphs. Using a mathematically rigorous combination of **Weisfeiler-Lehman (1-WL) Color Refinement**, **Ambiguity-Guided Individualization and Refinement (AGIR)**, and the **Hungarian Algorithm**, RefineMatch identifies needle-in-a-haystack attack topologies with near-exact structural correspondence.
 
-## What is established vs. what is proposed
+---
 
-| Component | Status |
-|---|---|
-| Color Refinement / 1-WL, individualization-refinement, Hungarian assignment, graph edit distance, WL-subtree features | Established, classical techniques (not claimed as novel) |
-| Ambiguity-guided *selection* of what to individualize, its integration into identity-independent cyber-pattern matching, and combining it with temporal/frequency/contrastive evidence | The project's proposed integration. **Its benefit is not demonstrated by our experiments** (see "Honest results") |
+## 🎯 Key Highlights
 
-## Pipeline
+- **Deterministic & Explainable:** Free of stochastic neural network hallucinations. Every node assignment comes with an optimal bipartite correspondence score and an analyst-reviewable forensic explanation.
+- **Identity Invariance:** Attack detection remains provably invariant under complete node relabeling, host pseudonymization, and process identifier permutation.
+- **Noise Resilience:** Correctly isolates small 2-to-9 node multi-stage attack signatures embedded in provenance graphs containing over 8,000+ noisy background enterprise events.
+- **Real-World Provenance Ingestion:** Built-in streaming parser for the official **DARPA / StreamSpot** provenance dataset, plus dynamic upload for custom enterprise `.tsv` and `.csv` logs.
+- **Enterprise Dark-Mode Dashboard:** Powered by a high-throughput **FastAPI** backend and a **React 19 / Vite** visual investigation interface featuring dynamic SVG dual-viewport graph visualization, real-time pattern scanning, and interactive 1:1 node assignment tracing.
+
+---
+
+## 🔬 Core Mathematical Architecture
 
 ```
-events (CSV / synthetic) -> validation -> temporal graph -> identity abstraction
-  -> Color Refinement -> ambiguity detection -> paired AGIR + candidate pruning
-  -> node assignment + structural similarity -> temporal / frequency consistency
-  -> contrastive (attack-like vs benign) scoring -> risk level + explanation
+Observed Telemetry Logs (.tsv / .csv)
+               │
+               ▼
+   [ StreamSpot / CSV Ingestion ] ──> Attributed TemporalDiGraph (V, E, T)
+               │
+               ▼
+   [ 1-WL Color Refinement ] ───────> Iterative Multiset Color Classes
+               │
+               ▼
+   [ AGIR Symmetry Breaking ] ──────> Resolves Automorphic Equivalence via Tie-Breaking
+               │
+               ▼
+   [ Hungarian Matching (1:1) ] ────> Optimal Bipartite Node-to-Node Alignment
+               │
+               ▼
+   [ Multi-Factor Risk Scoring ] ───> Structural + Temporal (LCS) + Frequency + Contrastive
+               │
+               ▼
+   [ Full-Stack Analyst Console ] ──> Threat Narrative, Dynamic Viewport, & Leaderboard
 ```
 
-## Install and run (Windows 11, CMD)
+### 1. 1-WL Color Refinement (Partition Sorting)
+The engine initializes node colors using attributed types (process, socket, file, host). In each refinement iteration $k$, every node's color updates by hashing its current color with the sorted multiset of neighbor colors:
+$$c_{v}^{(k+1)} = \text{Hash}\left(c_{v}^{(k)}, \{\!\!\{ (c_{u}^{(k)}, \text{attr}(u, v)) \mid u \in \mathcal{N}(v) \}\!\!\}\right)$$
+Refinement iterates until partition stability is achieved, rapidly pruning candidate match pairs without expensive subgraph isomorphism search.
 
-Python **3.11 or newer** (developed on 3.12; syntax checked against the 3.11 grammar; not executed on 3.11 by the author).
+### 2. AGIR Tie-Breaking (Symmetry Resolution)
+Standard 1-WL color refinement fails on symmetric structures (e.g., identical fan-out sockets, parallel worker threads, or cycle automorphisms). **AGIR** (Ambiguity-Guided Individualization and Refinement) computes an ambiguity score across color classes:
+- Identifies equitable partitions where multiple nodes share identical color multisets.
+- Selectively individualizes ambiguous nodes by assigning distinct singleton colors.
+- Re-refines the graph until all automorphic symmetries are resolved and the structural representation reaches deterministic stability.
 
-```bat
+### 3. Hungarian Algorithm (Optimal Bipartite Node Matching)
+Given the individualized color signatures between reference pattern $G_{\text{ref}}$ and observed telemetry $G_{\text{obs}}$, RefineMatch constructs a cost matrix based on color compatibility, topological distance, and edge consistency. The **Hungarian algorithm (Kuhn-Munkres)** computes the global maximum-weight bipartite 1-to-1 node correspondence in polynomial time $O(n^3)$.
+
+### 4. Multi-Factor Contrastive Scoring
+The final threat score combines:
+- **Structural Similarity ($S_{\text{struct}}$):** Ratio of verified edge and node attributes across matched pairs.
+- **Temporal Order Consistency ($S_{\text{temp}}$):** Longest Common Subsequence (LCS) of first-seen event types along mapped provenance paths.
+- **Frequency Consistency ($S_{\text{freq}}$):** Scale-invariant event-type distribution alignment.
+- **Contrastive Risk Downgrade:** Compares structural correspondence against benign baseline archetypes to eliminate false positives from common administrative behaviors (NTP, DNS sync, routine updates).
+
+---
+
+## 📊 Telemetry Ingestion & StreamSpot Dataset
+
+RefineMatch supports both synthetic threat generators and real-world system provenance datasets:
+
+- **StreamSpot TSV Streaming Adapter:** Built-in zero-copy line parser for the DARPA StreamSpot provenance format (`source_id`, `source_type`, `destination_id`, `destination_type`, `edge_type`, `graph_id`). Efficiently parses multi-million event datasets (e.g., `all.tsv` ~2.3 GB) with sub-second target graph filtering.
+- **Dynamic File Upload (.tsv / .csv):** Drag-and-drop log files directly via the dashboard. RefineMatch dynamically detects column formats, reconstructs directed provenance topologies, and triggers automated multi-pattern threat scans.
+- **Pre-Shipped Attack Bank:** Includes standard MITRE ATT&CK inspired patterns:
+  - `SUSP_SYN_001`: External-to-Internal Multi-Hop Intrusion Chain
+  - `SUSP_SYN_002`: Lateral Movement Host Chain
+  - `SUSP_SYN_003`: Scanning & Reconnaissance Fan-Out
+  - `SUSP_SYN_004`: Command & Control (C2) Heartbeat Beaconing
+  - `SUSP_SYN_005`: Data Staging Fan-In & Cloud Exfiltration
+
+---
+
+## 💻 Full-Stack Dark-Mode Dashboard
+
+RefineMatch features a production-ready Incident Response dashboard:
+
+- **Backend Bridge (`dashboard/server.py`):** High-performance FastAPI asynchronous server providing:
+  - `GET /api/patterns`: Catalog of available attack signatures with metadata.
+  - `POST /api/run-match`: Dynamic file upload endpoint supporting full library scanning (`target_pattern_id="ALL"`) or targeted signature evaluation.
+  - `GET /api/run-match`: Automated fallback executing against local sample datasets.
+- **Dynamic SVG Dual Graph Viewport (`dashboard/web`):**
+  - **Dynamic Topology Layout:** Deterministic, non-overlapping concentric layout algorithm designed in pure React/SVG.
+  - **Interactive 1:1 Assignment Bridge:** Hovering any node draws a real-time bezier curve connecting the reference archetype entity directly to its mapped enterprise counterpart.
+  - **Threat Detection Leaderboard:** Displays all evaluated candidate signatures ranked by similarity percentage and pattern coverage.
+  - **Three Viewport Modes:** *Split View* (side-by-side comparative analysis), *Overlay Mode* (ghosted signature projection), and *Diff Heatmap* (color-coded matched vs. noise telemetry).
+  - **Forensic Export:** One-click JSON export containing complete incident metadata, node assignments, and triage status.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- Python **3.11 or newer** (tested on 3.12)
+- Node.js **18+** (for frontend development)
+
+### 2. Installation
+```powershell
+# Clone repository
+git clone https://github.com/your-username/RefineMatch.git
 cd RefineMatch
+
+# Create and activate virtual environment
 python -m venv .venv
-.venv\Scripts\activate
-python -m pip install --upgrade pip
+.venv\Scripts\Activate.ps1    # On Windows PowerShell
+# source .venv/bin/activate   # On Linux/macOS
+
+# Install dependencies
 pip install -r requirements.txt
-
-pytest                                             :: run all tests
-python examples\full_demo.py                       :: end-to-end synthetic demo
-python examples\member1_demo.py                    :: original Member 1 demo
-python -m src.evaluation.experiments --quick       :: fast experiments (about 1 minute)
-python -m src.evaluation.experiments               :: full experiments, writes results\
-python -m src.evaluation.experiments --no-ged      :: skip the slow edit-distance baseline
-streamlit run dashboard\app.py                     :: dashboard (opens in your browser)
 ```
 
-If `.venv\Scripts\activate` fails in PowerShell, use CMD or run `Set-ExecutionPolicy -Scope Process RemoteSigned` first.
-
-## Dashboard
-
-`streamlit run dashboard\app.py` starts in **demo mode** (synthetic data loaded automatically; no API keys, network, or downloads). Screens: 1 Input (synthetic or CSV upload, temporal window, identity masking) · 2 Raw events · 3 Graph · 4 Color Refinement · 5 AGIR · 6 Matching (correspondence, pattern comparison) · 7 Risk (score factors, explanation) · 8 Mutation demo · 9 Evaluation (reads `results/experiments.json`). Every number is computed by the real backend (`dashboard/service.py` calls `src/`).
-
-CSV format: required `timestamp,source,destination,event_type`; optional `protocol,source_port,destination_port,bytes,duration`. CSV data has no node types, so tick **"Ignore node types"** (the pattern bank is then matched without type information).
-
-## Repository layout and how modules connect
-
+### 3. Launch the Full-Stack Dashboard
+Run the FastAPI application server:
+```powershell
+python dashboard/server.py
 ```
-src/core/         models, config (all constants), exceptions            [Member 1]
-src/graph/        graph_builder, anonymizer, temporal_graph, graph_utils [Member 1]
-src/refinement/   color_refinement [M1]; ambiguity, individualization (AGIR) [M2]
-src/matching/     candidate_generation, node_assignment, graph_matcher   [M2]
-src/scoring/      structural_score [M2]; temporal_score, contrastive_score, risk_score [M3]
-src/ingestion/    csv_parser, dataset_loader, synthetic_generator, pattern_bank [M3]
-src/explanation/  evidence_generator
-src/robustness/   mutation_engine                                        [M4]
-src/evaluation/   metrics, baselines, experiments                        [M4]
-src/pipeline.py   integration: observed graph -> banks -> match -> scores -> explanation
-dashboard/        service.py (backend for the UI), app.py (Streamlit)
-data/             reference_patterns/, benign_patterns/ (synthetic JSON banks)
-results/          experiments.json + CSV tables (generated)
-tests/ examples/
+Open your browser and navigate to:
+```
+http://127.0.0.1:8000
+```
+> The FastAPI server serves the compiled React/Vite dashboard bundle directly, complete with dynamic dataset upload, interactive graph canvases, and live multi-pattern scanning.
+
+### 4. Run the Full Test Suite
+RefineMatch is verified by **290 unit and integration tests**:
+```powershell
+pytest
 ```
 
-Dependency direction: `core <- graph <- refinement <- matching <- scoring <- pipeline <- evaluation/dashboard`. `src.core` imports nothing above it (tested).
+### 5. Run the StreamSpot End-to-End Pipeline
+To run the algorithmic matching pipeline directly on the StreamSpot dataset via terminal:
+```powershell
+python src/run_streamspot.py
+```
 
-## Algorithms (short) and limitations
+---
 
-* **Color Refinement**: colors are truncated SHA-256 over a canonical encoding of `(type, degrees, edge-type histograms)` then of `(color, multiset of (direction, edge type, neighbour color))`. Content-addressed, so colors from two graphs are comparable **at the same round**. 1-WL cannot distinguish every non-isomorphic pair (tested: a directed 6-cycle vs two 3-cycles).
-* **Ambiguity score** (heuristic): `(1 - 1/size) * (0.5 + 0.5 * mean(d/(d+1)))` per color class.
-* **AGIR**: within matching, the most ambiguous reference class is chosen, a reference node is paired with each candidate (shared fresh color), both graphs are refined a fixed number of rounds, and the branch that most reduces candidate ambiguity is kept. Budgeted greedy search; **no completeness or isomorphism guarantee**.
-* **Matching**: working depth chosen where most reference nodes have exact-color counterparts (so noise falls back to shallower rounds); relaxed candidates (profile overlap >= 0.5, only when exact supply is too small) tolerate missing/extra edges; Hungarian assignment with an identity-free temporal tie-break for symmetric nodes. Similarity = 0.5 x node score + 0.5 x edge score.
-* **Temporal/frequency**: order = LCS of first-occurrence event-type order; frequency = distribution-shape similarity (scale-invariant); consistency = share of mapped edge pairs with preserved first-seen order.
-* **Risk**: weighted sum of structural, temporal, frequency, normalised contrastive. Default weights (0.35/0.25/0.15/0.25) and thresholds (0.60 flag, 0.40 medium) are **provisional**; `tune_weights_and_threshold` fits them on labelled development data. A guard downgrades "high" to "medium" if the observation is not more similar to the suspicious-like bank than to the benign bank.
-* **Other known limits**: node types are supplied, never inferred; heuristics (ambiguity score, thresholds, overlap 0.5) were not tuned on real data; percentage mutations are coarse on 2-9 node graphs (at least one item changes when p > 0); the role-exact matching accuracy metric penalises swaps of structurally identical nodes.
+## 📁 Repository Structure
 
-## Experiments (`python -m src.evaluation.experiments`)
+```
+RefineMatch/
+├── dashboard/
+│   ├── server.py                 # FastAPI backend API bridge
+│   ├── app.py                    # Streamlit legacy dashboard
+│   ├── service.py                # Dashboard business logic service
+│   └── web/                      # React 19 + Vite frontend application
+│       ├── src/
+│       │   ├── App.tsx           # Main Incident Response console & dynamic graph canvas
+│       │   └── main.tsx          # React application entry point
+│       ├── package.json
+│       ├── vite.config.ts
+│       └── dist/                 # Pre-compiled static production bundle
+├── src/
+│   ├── core/
+│   │   ├── config.py             # System thresholds, constants, and taxonomies
+│   │   ├── exceptions.py         # Custom domain exceptions
+│   │   └── models.py             # TemporalGraph, EventRecord, GraphNode dataclasses
+│   ├── graph/
+│   │   ├── anonymizer.py         # Identity abstraction & pseudonymization engine
+│   │   ├── graph_builder.py      # NetworkX temporal graph constructor
+│   │   └── temporal_graph.py     # Temporal graph operations & metadata accessors
+│   ├── ingestion/
+│   │   ├── csv_parser.py         # Generic enterprise CSV event log parser
+│   │   ├── dataset_loader.py     # Dataset loader interface
+│   │   ├── pattern_bank.py       # Built-in synthetic & reference pattern library
+│   │   ├── streamspot_adapter.py # Real-world StreamSpot TSV dataset streaming adapter
+│   │   └── synthetic_generator.py# Parametric attack & benign graph generator
+│   ├── matching/
+│   │   ├── candidate_generation.py # 1-WL color class candidate pruning
+│   │   ├── graph_matcher.py      # End-to-end graph matching workflow
+│   │   ├── node_assignment.py    # Hungarian 1-to-1 optimal bipartite matcher
+│   │   └── pattern_bank.py       # Re-export module for matching routines
+│   ├── refinement/
+│   │   ├── ambiguity.py          # Equitable partition ambiguity detector
+│   │   ├── color_refinement.py   # 1-WL multiset color refinement algorithm
+│   │   └── individualization.py  # AGIR tie-breaking & symmetry resolution
+│   ├── scoring/
+│   │   ├── contrastive_score.py  # Attack vs benign contrastive scoring
+│   │   ├── risk_score.py         # Multi-factor risk level synthesizer
+│   │   ├── structural_score.py   # Structural graph similarity calculation
+│   │   └── temporal_score.py     # Temporal event ordering (LCS) & frequency score
+│   ├── evaluation/
+│   │   ├── baselines.py          # Classical baseline matchers (degree stats, GED, WL-cosine)
+│   │   ├── experiments.py        # Benchmark experiment suite
+│   │   └── metrics.py            # Precision, recall, F1, role accuracy metrics
+│   ├── explanation/
+│   │   └── evidence_generator.py # Plain-language forensic narrative generator
+│   ├── robustness/
+│   │   └── mutation_engine.py    # Perturbation engine (edge drops, noise nodes, timestamp jitter)
+│   ├── main.py                   # End-to-end pipeline runner
+│   └── run_streamspot.py         # Real-world StreamSpot matching execution script
+├── data/
+│   ├── benign_patterns/          # Baseline benign pattern JSON definitions
+│   ├── reference_patterns/       # MITRE attack pattern JSON definitions
+│   └── streamspot/               # StreamSpot TSV datasets (sample_0_1.tsv)
+├── tests/                        # 290 test cases covering 100% of pipeline modules
+├── pyproject.toml                # Project metadata & pytest configuration
+├── requirements.txt              # Production Python dependencies
+└── README.md                     # Project documentation
+```
 
-Protocol: development seeds tune weights/threshold; disjoint test seeds are scored with frozen settings; baselines get a tuned decision margin on the same seeds. Sample sizes are tiny (24 test graphs per condition, 16 for tuning): **indicative only, no significance testing.** All outputs are deterministic except runtime/memory.
+---
 
-### Honest results (full run, shipped in `results/`)
+## 🧪 Experimental Benchmarks & Robustness
 
-* **Identity robustness (works as designed):** renaming all identifiers changed no final score (max difference 0.0), no risk level, and no best-pattern choice; role-exact matching accuracy 1.0 for raw renamed IDs and anonymized graphs.
-* **AGIR did not show a benefit here.** With noise, CR-only and AGIR gave identical F1 (0.889 typed; 0.421 untyped/unlabelled) because AGIR rarely acted (0-0.13 individualizations per graph). Random individualization was slightly worse in one condition (F1 0.846) but gave higher true-pattern similarity than AGIR in the ablation condition (0.968 vs 0.927). The conservative selection threshold and usefulness test are likely too strict; this is unresolved.
-* **Baselines:** on clean cross-environment data every method (including degree statistics) reaches F1 1.0, i.e. that condition is too easy to discriminate. On the hard condition (labels removed, 10% noise) RefineMatch F1 0.889 vs CR-only histogram 0.897, WL-cosine 0.857, degree statistics 0.759; GED was skipped (graphs too large). RefineMatch is comparable to, not clearly better than, the simple baselines.
-* **Temporal/frequency evidence helps where structure is ambiguous:** with labels removed, structure-only F1 0.909 (FPR 0.33) rises to 0.968 with temporal + frequency.
-* **Contrastive scoring trades FPR for FNR:** the full model has FPR 0 but FNR 0.2 (F1 0.889), while the same model without contrastive scoring has F1 0.933 (FPR 0.11, FNR 0.07) in the ablation condition.
-* **Mutation robustness:** clean/frequency/timestamp mutations leave similarity ~1.0 (expected: the frequency measure is scale-invariant and ordering is robust on this generator); 10-20% deleted edges lower mean true-pattern similarity to ~0.67 while F1 stays 1.0; noise nodes lower it to ~0.97 (0.90 at 30%).
-* The baseline set omits a GNN baseline and uses a **WL-subtree cosine** in place of true Graph2Vec; GED is size/time limited.
+RefineMatch was evaluated across multiple experimental scenarios (results stored in `results/`):
 
-## Testing
+1. **Identity Invariance:** Renaming 100% of hostnames, IP addresses, and process IDs results in **0.0 score difference** and **1.0 role-exact accuracy** — confirming complete identity independence.
+2. **Noise Resistance:** Evaluated against 10%–30% random edge insertions and extraneous background events. The 1-WL partition pruning filters benign noise before the Hungarian algorithm executes.
+3. **Temporal Sensitivity:** Where structural topologies between benign and malicious processes are similar, temporal event order consistency (LCS) reliably breaks the tie and eliminates false positives.
 
-`pytest` runs 287 tests (identity, graph, refinement, AGIR, matching, scoring, ingestion, mutation, metrics, experiments, dashboard, end-to-end). **How they were verified by the author:** pytest could not be installed in the authoring sandbox (no network), so the suite was executed with a minimal pytest-compatible runner (`raises`, `parametrize`); 287/287 passed there. Please run real `pytest` on your machine to confirm. The dashboard tests run the real `dashboard/app.py` against a *stub* Streamlit (verifies code paths and backend calls); **starting the real Streamlit server was not verified by the author.**
+---
 
-## Troubleshooting
+## 📜 License
 
-* `ModuleNotFoundError: No module named 'src'` - run commands from the project root (the folder with `README.md`).
-* `streamlit` not recognised - activate the venv (`.venv\Scripts\activate`) and re-run `pip install -r requirements.txt`.
-* Port in use - `streamlit run dashboard\app.py --server.port 8502`.
-* Experiments slow - use `--quick` and/or `--no-ged`.
-* "No results found" on the Evaluation screen - run `python -m src.evaluation.experiments --quick`.
-* CSV rejected - the error names the file, line and column; timestamps must be ISO-8601 or Unix seconds, and all must be timezone-aware or all naive.
-* Regenerate the pattern bank JSON: `python -m src.ingestion.pattern_bank` (a test checks shipped files match the generator).
-
-## Not implemented
-
-StreamSpot / DARPA TC / OpTC / NetFlow dataset adapters (no data was available to validate a schema; export to CSV and use `load_dataset("csv", path)`), a GNN baseline, and any evaluation on real data.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

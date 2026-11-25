@@ -307,6 +307,25 @@ export type RankedMatch = {
   coverage: number
 }
 
+export type ComparisonItem = {
+  id: string
+  label: string
+  name?: string
+  description?: string
+  similarity_score: number
+  reference_coverage: number
+  agir_steps: number
+  total_events: number
+  noise_events: number
+  matched_nodes_count: number
+  ref_graph_id?: string
+  obs_graph_id?: string
+  node_mapping: MappedNode[]
+  raw_mapping?: Record<string, string>
+  ref_graph: GraphPayload
+  obs_graph: GraphPayload
+}
+
 export type GraphNodeData = {
   id: string
   label: string
@@ -920,6 +939,9 @@ export default function App_v2() {
   const [patterns, setPatterns] = useState<PatternOption[]>([])
   const [selectedPattern, setSelectedPattern] = useState<string>("ALL")
   const [rankedMatches, setRankedMatches] = useState<RankedMatch[]>([])
+  const [comparisons, setComparisons] = useState<ComparisonItem[]>([])
+  const [bestMatchId, setBestMatchId] = useState<string>("")
+  const [selectedComparison, setSelectedComparison] = useState<string>("BEST_MATCH")
   const nodes = matchData.node_mapping
 
   const [bridge, setBridge] = useState<{
@@ -972,7 +994,73 @@ export default function App_v2() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setSelectedFile(file)
-      notify(`Dataset loaded: ${file.name}. Click "Execute RefineMatch" to analyze.`)
+      setSelectedComparison("BEST_MATCH")
+      e.target.value = ""
+      runMatching(file, "ALL")
+    }
+  }
+
+  const applyComparisonToView = (comp: ComparisonItem) => {
+    const processedRefGraph: GraphPayload = comp.ref_graph
+      ? {
+          nodes: comp.ref_graph.nodes.map((n) => ({ ...n })),
+          edges: comp.ref_graph.edges.map((e) => ({ ...e })),
+        }
+      : defaultRefGraph
+    const processedObsGraph: GraphPayload = comp.obs_graph
+      ? {
+          nodes: comp.obs_graph.nodes.map((n) => ({ ...n })),
+          edges: comp.obs_graph.edges.map((e) => ({ ...e })),
+        }
+      : defaultObsGraph
+
+    const refIdToIdx = new Map<string, number>()
+    processedRefGraph.nodes.forEach((rn: GraphNodeData, idx: number) => {
+      refIdToIdx.set(String(rn.id), idx)
+      rn.ref_index = idx
+    })
+
+    processedObsGraph.nodes.forEach((on: GraphNodeData) => {
+      if (on.mapped_from && refIdToIdx.has(String(on.mapped_from))) {
+        on.ref_index = refIdToIdx.get(String(on.mapped_from))
+        on.is_matched = true
+      }
+    })
+
+    setActive(null)
+    setSelected(null)
+    setMatchData({
+      similarity_score: Number(comp.similarity_score ?? 0),
+      reference_coverage: Number(comp.reference_coverage ?? 0),
+      total_events: Number(comp.total_events ?? 0),
+      noise_events: Number(comp.noise_events ?? 0),
+      agir_steps: Number(comp.agir_steps ?? 0),
+      matched_nodes_count: Number(comp.matched_nodes_count ?? 0),
+      node_mapping: comp.node_mapping?.length ? comp.node_mapping : defaultNodes,
+      threat_name: comp.name || comp.label,
+      signature_id: comp.id,
+      description: comp.description,
+      ref_graph: processedRefGraph,
+      obs_graph: processedObsGraph,
+      ref_graph_id: comp.ref_graph_id || comp.id,
+      obs_graph_id: comp.obs_graph_id,
+    })
+  }
+
+  const handleSelectComparison = (value: string) => {
+    setSelectedComparison(value)
+    if (comparisons.length === 0) return
+
+    const target =
+      value === "BEST_MATCH"
+        ? comparisons.find((c) => c.id === bestMatchId) || comparisons[0]
+        : comparisons.find((c) => c.id === value)
+
+    if (target) {
+      applyComparisonToView(target)
+      notify(
+        `Viewing ${value === "BEST_MATCH" ? "Best Match: " : ""}${target.name || target.id} (${(Number(target.similarity_score) * 100).toFixed(2)}%)`,
+      )
     }
   }
 
@@ -992,18 +1080,18 @@ export default function App_v2() {
       const endpoints = ["/api/run-match", "http://127.0.0.1:8000/api/run-match"]
       let data = null
 
-      const formData = new FormData()
-      if (targetFile) {
-        formData.append("file", targetFile)
-      }
-      formData.append("target_pattern_id", targetPattern)
-
       for (const ep of endpoints) {
         try {
           const url = `${ep}?target_pattern_id=${encodeURIComponent(targetPattern)}`
+          let bodyData: FormData | undefined = undefined
+          if (targetFile) {
+            bodyData = new FormData()
+            bodyData.append("file", targetFile)
+            bodyData.append("target_pattern_id", targetPattern)
+          }
           const res = await fetch(url, {
             method: "POST",
-            body: targetFile ? formData : undefined,
+            body: bodyData,
           })
           if (res.ok) {
             data = await res.json()
@@ -1021,42 +1109,52 @@ export default function App_v2() {
       }
 
       if (data && data.status === "success") {
-        const processedRefGraph = data.ref_graph as GraphPayload | undefined
-        const processedObsGraph = data.obs_graph as GraphPayload | undefined
+        if (Array.isArray(data.comparisons) && data.comparisons.length > 0) {
+          const evalComps = data.comparisons as ComparisonItem[]
+          const topId = data.best_match_id || evalComps[0].id
+          setComparisons(evalComps)
+          setBestMatchId(topId)
+          setSelectedComparison("BEST_MATCH")
+          const bestComp = evalComps.find((c) => c.id === topId) || evalComps[0]
+          applyComparisonToView(bestComp)
+        } else {
+          const processedRefGraph = data.ref_graph as GraphPayload | undefined
+          const processedObsGraph = data.obs_graph as GraphPayload | undefined
 
-        if (processedRefGraph && processedObsGraph && Array.isArray(processedRefGraph.nodes)) {
-          const refIdToIdx = new Map<string, number>()
-          processedRefGraph.nodes.forEach((rn: GraphNodeData, idx: number) => {
-            refIdToIdx.set(String(rn.id), idx)
-            rn.ref_index = idx
-          })
-
-          if (Array.isArray(processedObsGraph.nodes)) {
-            processedObsGraph.nodes.forEach((on: GraphNodeData) => {
-              if (on.mapped_from && refIdToIdx.has(String(on.mapped_from))) {
-                on.ref_index = refIdToIdx.get(String(on.mapped_from))
-                on.is_matched = true
-              }
+          if (processedRefGraph && processedObsGraph && Array.isArray(processedRefGraph.nodes)) {
+            const refIdToIdx = new Map<string, number>()
+            processedRefGraph.nodes.forEach((rn: GraphNodeData, idx: number) => {
+              refIdToIdx.set(String(rn.id), idx)
+              rn.ref_index = idx
             })
-          }
-        }
 
-        setMatchData({
-          similarity_score: Number(data.similarity_score ?? 0.9965),
-          reference_coverage: Number(data.reference_coverage ?? 1.0),
-          total_events: Number(data.total_events ?? 8295),
-          noise_events: Number(data.noise_events ?? data.benign_events_filtered ?? 8280),
-          agir_steps: Number(data.agir_steps ?? 7),
-          matched_nodes_count: Number(data.matched_nodes_count ?? 4),
-          node_mapping: data.node_mapping?.length ? data.node_mapping : defaultNodes,
-          threat_name: data.threat_name,
-          signature_id: data.signature_id,
-          description: data.description,
-          ref_graph: processedRefGraph || defaultRefGraph,
-          obs_graph: processedObsGraph || defaultObsGraph,
-          ref_graph_id: data.ref_graph_id,
-          obs_graph_id: data.obs_graph_id,
-        })
+            if (Array.isArray(processedObsGraph.nodes)) {
+              processedObsGraph.nodes.forEach((on: GraphNodeData) => {
+                if (on.mapped_from && refIdToIdx.has(String(on.mapped_from))) {
+                  on.ref_index = refIdToIdx.get(String(on.mapped_from))
+                  on.is_matched = true
+                }
+              })
+            }
+          }
+
+          setMatchData({
+            similarity_score: Number(data.similarity_score ?? 0.9965),
+            reference_coverage: Number(data.reference_coverage ?? 1.0),
+            total_events: Number(data.total_events ?? 8295),
+            noise_events: Number(data.noise_events ?? data.benign_events_filtered ?? 8280),
+            agir_steps: Number(data.agir_steps ?? 7),
+            matched_nodes_count: Number(data.matched_nodes_count ?? 4),
+            node_mapping: data.node_mapping?.length ? data.node_mapping : defaultNodes,
+            threat_name: data.threat_name,
+            signature_id: data.signature_id,
+            description: data.description,
+            ref_graph: processedRefGraph || defaultRefGraph,
+            obs_graph: processedObsGraph || defaultObsGraph,
+            ref_graph_id: data.ref_graph_id,
+            obs_graph_id: data.obs_graph_id,
+          })
+        }
         if (Array.isArray(data.ranked_matches)) {
           setRankedMatches(data.ranked_matches)
         }
@@ -1151,6 +1249,22 @@ export default function App_v2() {
     .filter(({ n }) =>
       Object.values(n).join(" ").toLowerCase().includes(search.toLowerCase()),
     )
+
+  const topComparison = useMemo(() => {
+    if (comparisons.length === 0) return null
+    return comparisons.find((c) => c.id === bestMatchId) || comparisons[0]
+  }, [comparisons, bestMatchId])
+
+  const otherComparisons = useMemo(() => {
+    if (comparisons.length === 0) return []
+    const topId = topComparison?.id
+    return comparisons.filter((c) => c.id !== topId)
+  }, [comparisons, topComparison])
+
+  const activeComparisonId =
+    selectedComparison === "BEST_MATCH"
+      ? bestMatchId || topComparison?.id || matchData.signature_id
+      : selectedComparison
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] text-[#1e2a38] font-['DM_Sans'] flex flex-col antialiased">
@@ -1272,28 +1386,37 @@ export default function App_v2() {
             </label>
           </div>
 
-          {/* Attack Signature Selector */}
+          {/* Comparison Selector Dropdown */}
           <div className="flex flex-col gap-1.5">
-            <label className="font-['DM_Sans'] text-[11px] font-semibold text-[#4a5568] uppercase tracking-wider">
-              Attack Pattern Bank
+            <label className="font-['DM_Sans'] text-[11px] font-semibold text-[#4a5568] uppercase tracking-wider flex items-center justify-between">
+              <span>Comparison Selector</span>
+              <span className="font-['DM_Mono'] text-[9px] text-[#0d9488]">
+                {comparisons.length > 0 ? `${comparisons.length} EVALUATED` : "BEST MATCH"}
+              </span>
             </label>
             <div className="relative">
               <select
-                value={selectedPattern}
-                onChange={(e) => {
-                  const newPat = e.target.value
-                  setSelectedPattern(newPat)
-                  runMatching(undefined, newPat)
-                }}
+                value={selectedComparison}
+                onChange={(e) => handleSelectComparison(e.target.value)}
                 disabled={isLoading}
-                className="w-full h-9 pl-3 pr-8 text-[12px] font-['DM_Sans'] font-medium rounded-[8px] bg-[#f7f8fa] border border-[#e1e5eb] text-[#1e2a38] focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] appearance-none cursor-pointer outline-none transition-all"
+                className="w-full h-9 pl-3 pr-8 text-[12px] font-['DM_Sans'] font-medium rounded-[8px] bg-[#f7f8fa] border border-[#e1e5eb] text-[#1e2a38] focus:border-[#0d9488] focus:ring-1 focus:ring-[#0d9488] appearance-none cursor-pointer outline-none transition-all truncate"
               >
-                <option value="ALL">🎯 Auto-Detect (Scan All Signatures)</option>
-                {patterns.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.id}: {p.name}
-                  </option>
-                ))}
+                <option value="BEST_MATCH">
+                  ★ Best Match — {topComparison ? `${topComparison.name || topComparison.id} (${(topComparison.similarity_score * 100).toFixed(2)}%)` : `${matchData.threat_name || matchData.signature_id} (${(matchData.similarity_score * 100).toFixed(2)}%)`}
+                </option>
+                {otherComparisons.length > 0
+                  ? otherComparisons.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.label || `${c.id} — ${c.name}`} ({(c.similarity_score * 100).toFixed(2)}%)
+                      </option>
+                    ))
+                  : patterns
+                      .filter((p) => p.id !== (topComparison?.id || matchData.signature_id))
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.id} — {p.name}
+                        </option>
+                      ))}
               </select>
               <span className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#8795a8]">
                 <Icon name="chevron" size={12} />
@@ -1303,7 +1426,7 @@ export default function App_v2() {
 
           {/* Run Match Action Button */}
           <button
-            onClick={() => runMatching()}
+            onClick={() => runMatching(undefined, "ALL")}
             disabled={isLoading}
             className="w-full h-11 rounded-[10px] bg-gradient-to-r from-[#0f766e] to-[#0d9488] hover:from-[#115e59] hover:to-[#0f766e] text-white font-['DM_Sans'] text-[13px] font-semibold shadow-xs hover:shadow-sm transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
           >
@@ -1509,16 +1632,19 @@ export default function App_v2() {
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-1 w-full max-w-full whitespace-nowrap min-w-0">
                 {rankedMatches.map((m, idx) => {
-                  const isSelected =
-                    selectedPattern === m.pattern_id ||
-                    (selectedPattern === "ALL" && matchData.signature_id === m.pattern_id)
+                  const isSelected = activeComparisonId === m.pattern_id
                   const simPct = (m.similarity_score * 100).toFixed(1)
                   return (
                     <button
                       key={m.pattern_id}
                       onClick={() => {
-                        setSelectedPattern(m.pattern_id)
-                        runMatching(undefined, m.pattern_id)
+                        if (comparisons.length > 0) {
+                          const targetVal = m.pattern_id === (bestMatchId || topComparison?.id) ? "BEST_MATCH" : m.pattern_id
+                          handleSelectComparison(targetVal)
+                        } else {
+                          setSelectedPattern(m.pattern_id)
+                          runMatching(undefined, m.pattern_id)
+                        }
                       }}
                       disabled={isLoading}
                       className={`flex items-center gap-2 px-3 py-1.5 rounded-[8px] text-[11px] font-medium whitespace-nowrap transition-all border cursor-pointer shrink-0 ${
@@ -1563,7 +1689,30 @@ export default function App_v2() {
                 </span>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap min-w-0">
+                {/* Mirrored Comparison Selector */}
+                <div className="relative min-w-0 max-w-[260px]">
+                  <select
+                    value={selectedComparison}
+                    onChange={(e) => handleSelectComparison(e.target.value)}
+                    disabled={isLoading}
+                    aria-label="Comparison selector"
+                    className="w-full h-7 pl-2.5 pr-7 text-[11px] font-['DM_Sans'] font-medium rounded-[6px] bg-[#f7f8fa] border border-[#e1e5eb] text-[#1e2a38] focus:border-[#0d9488] appearance-none cursor-pointer outline-none transition-all truncate"
+                  >
+                    <option value="BEST_MATCH">
+                      ★ Best Match — {topComparison ? `${topComparison.name || topComparison.id} (${(topComparison.similarity_score * 100).toFixed(2)}%)` : `${matchData.threat_name || matchData.signature_id} (${(matchData.similarity_score * 100).toFixed(2)}%)`}
+                    </option>
+                    {otherComparisons.map((c) => (
+                      <option key={c.id} value={c.id}>
+                        {c.label || `${c.id} — ${c.name}`} ({(c.similarity_score * 100).toFixed(2)}%)
+                      </option>
+                    ))}
+                  </select>
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-[#8795a8]">
+                    <Icon name="chevron" size={11} />
+                  </span>
+                </div>
+
                 {/* View switcher tabs */}
                 <div className="flex items-center p-0.5 rounded-[8px] bg-[#f0f2f5] border border-[#e1e5eb]">
                   {["Split view", "Overlay mode", "Diff heatmap"].map((v) => (

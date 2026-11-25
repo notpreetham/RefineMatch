@@ -13,7 +13,7 @@ python -m pip install fastapi uvicorn networkx scipy numpy pytest python-multipa
 
 3. ADD THE DATASET
 Download the DARPA/StreamSpot dataset (all.tsv).
-Place it exactly in this directory structure:
+Place it exactly in this directory structure:   (prolly optional)
 data/streamspot/all.tsv
 
 4. RUN THE DASHBOARD SERVER

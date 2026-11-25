@@ -118,6 +118,57 @@ def list_available_patterns() -> List[Dict[str, Any]]:
     return patterns
 
 
+_ACTOR_NODE_TYPES = {"a", "process", "proc", "agent", "client"}
+_ENTITY_NODE_TYPES = {"c", "file", "channel", "server", "database", "db", "fileserver", "host"}
+_NETWORK_NODE_TYPES = {"f", "socket", "net", "network", "d", "device"}
+_FLOW_EDGE_TYPES = {
+    "http_request",
+    "remote_exec",
+    "sql_query",
+    "remote_login",
+    "smb_access",
+    "probe",
+    "beacon",
+    "tasking",
+    "file_transfer",
+    "bulk_upload",
+    "flow",
+}
+
+
+def _normalize_tg_for_matching(tg: TemporalGraph) -> TemporalGraph:
+    """Return a copy of TemporalGraph with node_type and edge_type normalized into a shared taxonomy.
+
+    Bridges StreamSpot node/edge labels (a/c/f, flow) with synthetic pattern bank
+    labels (external/server/client/database, http_request/probe/etc.) without
+    mutating the original graph attributes used for UI display.
+    """
+    g = tg.graph.copy()
+    for n, d in g.nodes(data=True):
+        t = str(d.get("node_type", "node")).lower().strip()
+        if t in _ACTOR_NODE_TYPES:
+            d["node_type"] = "actor"
+        elif t in _ENTITY_NODE_TYPES:
+            d["node_type"] = "entity"
+        elif t in _NETWORK_NODE_TYPES:
+            d["node_type"] = "network"
+        elif t in ("external", "ext"):
+            d["node_type"] = "actor" if g.in_degree(n) == 0 else "entity"
+
+    for _, _, d in g.edges(data=True):
+        et = str(d.get("edge_type", "flow")).lower().strip()
+        if et in _FLOW_EDGE_TYPES:
+            d["edge_type"] = "flow"
+            d["edge_types"] = {"flow": d.get("weight", 1)}
+
+    return TemporalGraph(
+        graph=g,
+        events=tg.events,
+        start_time=tg.start_time,
+        end_time=tg.end_time,
+    )
+
+
 def _match_pattern_pair(
     ref_tg: TemporalGraph,
     obs_tg: TemporalGraph,
@@ -125,54 +176,57 @@ def _match_pattern_pair(
     precomputed_obs_colors: Optional[Any] = None,
 ) -> Tuple[float, float, int, int, Dict[str, str], List[Dict[str, Any]]]:
     """Execute 1-WL, AGIR, and Hungarian assignment for one (reference, observed) pair."""
+    norm_ref_tg = _normalize_tg_for_matching(ref_tg)
+    norm_obs_tg = obs_tg if precomputed_obs_colors is not None else _normalize_tg_for_matching(obs_tg)
+
     # 1. Refinement Phase (1-WL)
-    ref_colors = initialize_colors(ref_tg)
-    ref_colors = refine_once(ref_tg, ref_colors)
+    ref_colors = initialize_colors(norm_ref_tg)
+    ref_colors = refine_once(norm_ref_tg, ref_colors)
 
     if precomputed_obs_colors is not None:
         obs_colors = precomputed_obs_colors
         agir_steps = 0
     else:
-        obs_colors = initialize_colors(obs_tg)
-        obs_colors = refine_once(obs_tg, obs_colors)
+        obs_colors = initialize_colors(norm_obs_tg)
+        obs_colors = refine_once(norm_obs_tg, obs_colors)
 
         # 2. AGIR Symmetry Breaking Loop
         agir_steps = 0
         while not obs_colors.stable and agir_steps < max_agir_iterations:
-            indiv_res = individualize_graph(obs_tg, obs_colors)
+            indiv_res = individualize_graph(norm_obs_tg, obs_colors)
             if indiv_res.stable:
                 obs_colors = indiv_res
                 break
-            obs_colors = refine_once(obs_tg, indiv_res)
+            obs_colors = refine_once(norm_obs_tg, indiv_res)
             agir_steps += 1
 
     ref_steps = 0
-    ref_limit = min(max_agir_iterations, 5) if ref_tg.graph.number_of_nodes() > 500 else max_agir_iterations
+    ref_limit = min(max_agir_iterations, 5) if norm_ref_tg.graph.number_of_nodes() > 500 else max_agir_iterations
     while not ref_colors.stable and ref_steps < ref_limit:
-        indiv_res = individualize_graph(ref_tg, ref_colors)
+        indiv_res = individualize_graph(norm_ref_tg, ref_colors)
         if indiv_res.stable:
             ref_colors = indiv_res
             break
-        ref_colors = refine_once(ref_tg, indiv_res)
+        ref_colors = refine_once(norm_ref_tg, indiv_res)
         ref_steps += 1
 
     # 3. Candidate Generation & Hungarian Assignment
     MAX_MATCH_NODES = 50
-    if ref_tg.graph.number_of_nodes() > MAX_MATCH_NODES:
+    if norm_ref_tg.graph.number_of_nodes() > MAX_MATCH_NODES:
         focal_nodes = sorted(
-            ref_tg.graph.nodes,
-            key=lambda n: ref_tg.graph.degree(n),
+            norm_ref_tg.graph.nodes,
+            key=lambda n: norm_ref_tg.graph.degree(n),
             reverse=True,
         )[:MAX_MATCH_NODES]
-        match_ref_subgraph = ref_tg.graph.subgraph(focal_nodes).copy()
+        match_ref_subgraph = norm_ref_tg.graph.subgraph(focal_nodes).copy()
         match_ref_colors = {n: ref_colors.node_colors[n] for n in focal_nodes}
     else:
-        match_ref_subgraph = ref_tg.graph
+        match_ref_subgraph = norm_ref_tg.graph
         match_ref_colors = ref_colors.node_colors
 
     candidates = generate_candidates(
         reference_graph=match_ref_subgraph,
-        observed_graph=obs_tg.graph,
+        observed_graph=norm_obs_tg.graph,
         reference_colors=match_ref_colors,
         observed_colors=obs_colors.node_colors,
         allow_relaxed=True,
@@ -181,14 +235,14 @@ def _match_pattern_pair(
     mapping = assign_nodes(
         candidate_map=candidates,
         reference_graph=match_ref_subgraph,
-        observed_graph=obs_tg.graph,
+        observed_graph=norm_obs_tg.graph,
         reference_colors=match_ref_colors,
         observed_colors=obs_colors.node_colors,
     )
 
     # 4. Scoring
     matched_nodes = sorted(mapping.keys())
-    unmatched_obs = sorted(set(obs_tg.graph.nodes) - set(mapping.values()))
+    unmatched_obs = sorted(set(norm_obs_tg.graph.nodes) - set(mapping.values()))
     unmatched_ref = sorted(set(match_ref_subgraph.nodes) - set(matched_nodes))
     coverage = len(matched_nodes) / max(1, match_ref_subgraph.number_of_nodes())
 
@@ -203,17 +257,17 @@ def _match_pattern_pair(
     )
 
     score_ref_tg = (
-        ref_tg
-        if match_ref_subgraph is ref_tg.graph
+        norm_ref_tg
+        if match_ref_subgraph is norm_ref_tg.graph
         else TemporalGraph(
             graph=match_ref_subgraph,
-            events=[e for e in ref_tg.events if e.source in match_ref_subgraph and e.destination in match_ref_subgraph],
-            start_time=ref_tg.start_time,
-            end_time=ref_tg.end_time,
+            events=[e for e in norm_ref_tg.events if e.source in match_ref_subgraph and e.destination in match_ref_subgraph],
+            start_time=norm_ref_tg.start_time,
+            end_time=norm_ref_tg.end_time,
         )
     )
 
-    raw_similarity = calculate_structural_similarity(score_ref_tg, obs_tg, match_result)
+    raw_similarity = calculate_structural_similarity(score_ref_tg, norm_obs_tg, match_result)
     similarity_score = round(float(raw_similarity), 4)
 
     # 5. Formatted Node Correspondence Table
@@ -264,6 +318,156 @@ def _match_pattern_pair(
     return similarity_score, coverage, total_steps, len(mapping), mapping, formatted_mapping
 
 
+def _build_comparison_payload(
+    active_pat: TemporalGraph,
+    obs_tg: TemporalGraph,
+    obs_graph_id: Any,
+    res: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Build a lightweight comparison payload with <= 25-node subgraphs for one evaluated pair."""
+    active_pid = getattr(active_pat, "pattern_id", "") or active_pat.graph.graph.get("pattern_id", "")
+    active_name = getattr(active_pat, "name", "") or active_pat.graph.graph.get("name", "")
+    active_meta = getattr(active_pat, "meta", {}) or active_pat.graph.graph.get("meta", {}) or {}
+    active_desc = active_meta.get("description", "") or active_pat.graph.graph.get("description", "")
+
+    total_events = len(active_pat.events) + len(obs_tg.events)
+    noise_events = max(0, len(obs_tg.events) - len(active_pat.events))
+
+    raw_mapping = res["mapping"]
+    matched_ref_ids = set(raw_mapping.keys())
+
+    # Bound reference subgraph to <= 25 nodes
+    if active_pat.graph.number_of_nodes() <= 25:
+        ref_subgraph_nodes = set(active_pat.graph.nodes)
+    else:
+        ref_subgraph_nodes = set(list(matched_ref_ids)[:25])
+        for r_id in list(matched_ref_ids):
+            if len(ref_subgraph_nodes) >= 25:
+                break
+            if r_id in active_pat.graph:
+                for nbr in list(active_pat.graph.neighbors(r_id))[:3]:
+                    ref_subgraph_nodes.add(nbr)
+                    if len(ref_subgraph_nodes) >= 25:
+                        break
+        if len(ref_subgraph_nodes) < 6:
+            for n in list(active_pat.graph.nodes)[:10]:
+                ref_subgraph_nodes.add(n)
+                if len(ref_subgraph_nodes) >= 25:
+                    break
+
+    ref_nodes = []
+    for n in ref_subgraph_nodes:
+        if n in active_pat.graph:
+            raw_t = active_pat.graph.nodes[n].get("node_type", "node")
+            ntype, label, color = _categorize_node(str(n), raw_t)
+            mapped_to = raw_mapping.get(n, None)
+            ref_nodes.append(
+                {
+                    "id": str(n),
+                    "label": label,
+                    "type": ntype,
+                    "color": color,
+                    "is_matched": n in matched_ref_ids,
+                    "mapped_to": str(mapped_to) if mapped_to is not None else None,
+                }
+            )
+
+    ref_edges = []
+    ref_subgraph_obj = active_pat.graph.subgraph(ref_subgraph_nodes)
+    for u, v, data in ref_subgraph_obj.edges(data=True):
+        edge_label = data.get("event_type") or data.get("action") or "flow"
+        ref_edges.append(
+            {
+                "source": str(u),
+                "target": str(v),
+                "label": str(edge_label),
+                "is_matched": u in matched_ref_ids and v in matched_ref_ids,
+            }
+        )
+
+    matched_obs_ids = set(raw_mapping.values())
+    obs_subgraph_nodes = set(list(matched_obs_ids)[:25])
+
+    # Include local contextual neighbors around matched nodes (strictly capped at 25 nodes)
+    for m_id in list(matched_obs_ids):
+        if len(obs_subgraph_nodes) >= 25:
+            break
+        if m_id in obs_tg.graph:
+            for neighbor in list(obs_tg.graph.neighbors(m_id))[:3]:
+                obs_subgraph_nodes.add(neighbor)
+                if len(obs_subgraph_nodes) >= 25:
+                    break
+            for pred in list(obs_tg.graph.predecessors(m_id))[:3]:
+                obs_subgraph_nodes.add(pred)
+                if len(obs_subgraph_nodes) >= 25:
+                    break
+
+    if len(obs_subgraph_nodes) < 6:
+        for n in list(obs_tg.graph.nodes)[:10]:
+            obs_subgraph_nodes.add(n)
+            if len(obs_subgraph_nodes) >= 25:
+                break
+
+    reverse_map = {v: k for k, v in raw_mapping.items()}
+    obs_nodes = []
+    for n in obs_subgraph_nodes:
+        if n in obs_tg.graph:
+            raw_t = obs_tg.graph.nodes[n].get("node_type", "node")
+            ntype, label, color = _categorize_node(str(n), raw_t)
+            is_matched = n in matched_obs_ids
+            mapped_from = reverse_map.get(n, None)
+            obs_nodes.append(
+                {
+                    "id": str(n),
+                    "label": label,
+                    "type": ntype,
+                    "color": color,
+                    "is_matched": is_matched,
+                    "mapped_from": str(mapped_from) if mapped_from is not None else None,
+                }
+            )
+
+    obs_edges = []
+    subgraph_obj = obs_tg.graph.subgraph(obs_subgraph_nodes)
+    for u, v, data in subgraph_obj.edges(data=True):
+        edge_label = data.get("event_type") or data.get("action") or "flow"
+        obs_edges.append(
+            {
+                "source": str(u),
+                "target": str(v),
+                "label": str(edge_label),
+                "is_matched": u in matched_obs_ids and v in matched_obs_ids,
+            }
+        )
+
+    display_label = f"{active_pid} — {active_name}" if active_name else str(active_pid)
+
+    return {
+        "id": str(active_pid),
+        "label": display_label,
+        "name": str(active_name),
+        "description": active_desc,
+        "similarity_score": res["similarity_score"],
+        "reference_coverage": res["coverage"],
+        "agir_steps": res["agir_steps"],
+        "total_events": total_events,
+        "noise_events": noise_events,
+        "matched_nodes_count": res["matched_nodes_count"],
+        "ref_graph_id": str(active_pid),
+        "obs_graph_id": str(obs_graph_id),
+        "node_mapping": res["formatted_mapping"],
+        "raw_mapping": res["mapping"],
+        "ref_graph": {
+            "nodes": ref_nodes,
+            "edges": ref_edges,
+        },
+        "obs_graph": {
+            "nodes": obs_nodes,
+            "edges": obs_edges,
+        },
+    }
+
+
 async def _execute_pipeline_on_file(
     filepath: str | Path,
     target_pattern_id: str = "ALL",
@@ -302,84 +506,36 @@ async def _execute_pipeline_on_file(
         except Exception:
             pass
 
-    # Precompute observed graph refinement once to accelerate multi-pattern evaluation
-    base_obs_colors = initialize_colors(obs_tg)
-    precomputed_obs_colors = refine_once(obs_tg, base_obs_colors)
+    # Precompute observed graph refinement once (on normalized graph) to accelerate multi-pattern evaluation
+    norm_obs_tg = _normalize_tg_for_matching(obs_tg)
+    base_obs_colors = initialize_colors(norm_obs_tg)
+    precomputed_obs_colors = refine_once(norm_obs_tg, base_obs_colors)
     agir_steps_obs = 0
-    agir_limit = min(max_agir_iterations, 5) if obs_tg.graph.number_of_nodes() > 500 else max_agir_iterations
+    agir_limit = min(max_agir_iterations, 5) if norm_obs_tg.graph.number_of_nodes() > 500 else max_agir_iterations
     while not precomputed_obs_colors.stable and agir_steps_obs < agir_limit:
-        indiv_res = individualize_graph(obs_tg, precomputed_obs_colors)
+        indiv_res = individualize_graph(norm_obs_tg, precomputed_obs_colors)
         if indiv_res.stable:
             precomputed_obs_colors = indiv_res
             break
-        precomputed_obs_colors = refine_once(obs_tg, indiv_res)
+        precomputed_obs_colors = refine_once(norm_obs_tg, indiv_res)
         agir_steps_obs += 1
 
-    # 2. Execute matching based on target_pattern_id
+    # 2. Evaluate all candidate patterns through 1-WL, AGIR, Hungarian assignment, and scoring
+    comparisons: List[Dict[str, Any]] = []
+    comparisons_by_id: Dict[str, Dict[str, Any]] = {}
     ranked_matches: List[Dict[str, Any]] = []
-    results_by_pattern: Dict[str, Any] = {}
 
-    target_id_clean = (target_pattern_id or "ALL").strip()
-
-    if target_id_clean.upper() == "ALL":
-        for pat in candidate_patterns:
-            pid = getattr(pat, "pattern_id", "") or pat.graph.graph.get("pattern_id", "")
-            pname = getattr(pat, "name", "") or pat.graph.graph.get("name", "")
-            sim, cov, steps, mapped_cnt, raw_map, fmt_map = _match_pattern_pair(
-                pat,
-                obs_tg,
-                max_agir_iterations=max_agir_iterations,
-                precomputed_obs_colors=precomputed_obs_colors,
-            )
-            results_by_pattern[pid] = {
-                "pattern": pat,
-                "similarity_score": sim,
-                "coverage": cov,
-                "agir_steps": steps + agir_steps_obs,
-                "matched_nodes_count": mapped_cnt,
-                "mapping": raw_map,
-                "formatted_mapping": fmt_map,
-            }
-            ranked_matches.append(
-                {
-                    "pattern_id": pid,
-                    "name": pname,
-                    "similarity_score": sim,
-                    "coverage": cov,
-                }
-            )
-
-        # Rank descending by similarity score, then coverage
-        ranked_matches.sort(
-            key=lambda item: (item["similarity_score"], item["coverage"]),
-            reverse=True,
-        )
-        top_pid = ranked_matches[0]["pattern_id"]
-        top_res = results_by_pattern[top_pid]
-
-    else:
-        # Match against one specific pattern
-        selected_pat = None
-        for pat in candidate_patterns:
-            pid = getattr(pat, "pattern_id", "") or pat.graph.graph.get("pattern_id", "")
-            if pid.lower() == target_id_clean.lower() or target_id_clean.lower() in pid.lower():
-                selected_pat = pat
-                break
-
-        if selected_pat is None:
-            # Fallback to first pattern if specific ID not found
-            selected_pat = candidate_patterns[0]
-
-        pid = getattr(selected_pat, "pattern_id", "") or selected_pat.graph.graph.get("pattern_id", "")
-        pname = getattr(selected_pat, "name", "") or selected_pat.graph.graph.get("name", "")
+    for pat in candidate_patterns:
+        pid = getattr(pat, "pattern_id", "") or pat.graph.graph.get("pattern_id", "")
+        pname = getattr(pat, "name", "") or pat.graph.graph.get("name", "")
         sim, cov, steps, mapped_cnt, raw_map, fmt_map = _match_pattern_pair(
-            selected_pat,
-            obs_tg,
+            pat,
+            norm_obs_tg,
             max_agir_iterations=max_agir_iterations,
             precomputed_obs_colors=precomputed_obs_colors,
         )
-        top_res = {
-            "pattern": selected_pat,
+        res_entry = {
+            "pattern": pat,
             "similarity_score": sim,
             "coverage": cov,
             "agir_steps": steps + agir_steps_obs,
@@ -387,59 +543,64 @@ async def _execute_pipeline_on_file(
             "mapping": raw_map,
             "formatted_mapping": fmt_map,
         }
-        # Also compute lightweight summary of all candidate patterns for the leaderboard
-        for pat in candidate_patterns:
-            p_id = getattr(pat, "pattern_id", "") or pat.graph.graph.get("pattern_id", "")
-            p_name = getattr(pat, "name", "") or pat.graph.graph.get("name", "")
-            if p_id == pid:
-                p_sim, p_cov = sim, cov
-            else:
-                p_sim, p_cov, _, _, _, _ = _match_pattern_pair(
-                    pat,
-                    obs_tg,
-                    max_agir_iterations=5,
-                    precomputed_obs_colors=precomputed_obs_colors,
-                )
-            ranked_matches.append(
-                {
-                    "pattern_id": p_id,
-                    "name": p_name,
-                    "similarity_score": p_sim,
-                    "coverage": p_cov,
-                }
-            )
-        ranked_matches.sort(
-            key=lambda item: (item["similarity_score"], item["coverage"]),
-            reverse=True,
+        comp_payload = _build_comparison_payload(pat, obs_tg, obs_graph_id, res_entry)
+        comparisons.append(comp_payload)
+        comparisons_by_id[str(pid)] = comp_payload
+        ranked_matches.append(
+            {
+                "pattern_id": pid,
+                "name": pname,
+                "similarity_score": sim,
+                "coverage": cov,
+            }
         )
 
-    # 3. Format complete detailed payload
-    active_pat = top_res["pattern"]
-    active_pid = getattr(active_pat, "pattern_id", "") or active_pat.graph.graph.get("pattern_id", "")
-    active_name = getattr(active_pat, "name", "") or active_pat.graph.graph.get("name", "")
-    active_meta = getattr(active_pat, "meta", {}) or active_pat.graph.graph.get("meta", {}) or {}
-    active_desc = active_meta.get("description", "") or active_pat.graph.graph.get("description", "")
+    # Sort all evaluated results in descending order by similarity_score (then coverage)
+    comparisons.sort(
+        key=lambda item: (item["similarity_score"], item["reference_coverage"]),
+        reverse=True,
+    )
+    ranked_matches.sort(
+        key=lambda item: (item["similarity_score"], item["coverage"]),
+        reverse=True,
+    )
 
-    total_events = len(active_pat.events) + len(obs_tg.events)
-    noise_events = max(0, len(obs_tg.events) - len(active_pat.events))
+    best_match_id = comparisons[0]["id"]
+    target_id_clean = (target_pattern_id or "ALL").strip()
+
+    if target_id_clean.upper() in ("ALL", "BEST_MATCH", ""):
+        primary_comp = comparisons[0]
+    else:
+        primary_comp = comparisons_by_id.get(target_id_clean)
+        if primary_comp is None:
+            for c in comparisons:
+                if c["id"].lower() == target_id_clean.lower() or target_id_clean.lower() in c["id"].lower():
+                    primary_comp = c
+                    break
+        if primary_comp is None:
+            primary_comp = comparisons[0]
 
     return {
         "status": "success",
         "incident_id": f"IR-{datetime.now().strftime('%Y-%m%d')}",
-        "signature_id": active_pid,
-        "threat_name": active_name,
-        "description": active_desc,
-        "similarity_score": top_res["similarity_score"],
-        "reference_coverage": top_res["coverage"],
-        "total_events": total_events,
-        "noise_events": noise_events,
-        "benign_events_filtered": noise_events,
-        "agir_steps": top_res["agir_steps"],
-        "matched_nodes_count": top_res["matched_nodes_count"],
-        "ref_graph_id": str(active_pid),
-        "obs_graph_id": str(obs_graph_id),
-        "node_mapping": top_res["formatted_mapping"],
-        "raw_mapping": top_res["mapping"],
+        "best_match_id": best_match_id,
+        "comparisons": comparisons,
+        "signature_id": primary_comp["id"],
+        "threat_name": primary_comp["name"],
+        "description": primary_comp["description"],
+        "similarity_score": primary_comp["similarity_score"],
+        "reference_coverage": primary_comp["reference_coverage"],
+        "total_events": primary_comp["total_events"],
+        "noise_events": primary_comp["noise_events"],
+        "benign_events_filtered": primary_comp["noise_events"],
+        "agir_steps": primary_comp["agir_steps"],
+        "matched_nodes_count": primary_comp["matched_nodes_count"],
+        "ref_graph_id": primary_comp["ref_graph_id"],
+        "obs_graph_id": primary_comp["obs_graph_id"],
+        "ref_graph": primary_comp["ref_graph"],
+        "obs_graph": primary_comp["obs_graph"],
+        "node_mapping": primary_comp["node_mapping"],
+        "raw_mapping": primary_comp["raw_mapping"],
         "ranked_matches": ranked_matches,
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
