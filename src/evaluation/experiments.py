@@ -372,7 +372,13 @@ def _figures(R, outdir):
         import matplotlib.pyplot as plt
     except Exception:
         return
-    C = ["#2a6fdb", "#e07a1f", "#3a9e5f", "#b5384b", "#7d5ba6", "#8c8c8c", "#1aa3a3", "#c9a227", "#555555", "#d45fa1"]
+    # palette shared with the dashboard design system (app/ui.py)
+    C = ["#3b72b8", "#b87c2a", "#2e7d6f", "#7b4fa6", "#c0392b", "#8795a8", "#5a8fd4", "#2a5490", "#4a5568", "#cdd3db"]
+    plt.rcParams.update({"font.family": ["Helvetica Neue", "Arial", "DejaVu Sans"], "font.size": 9,
+                         "axes.edgecolor": "#cdd3db", "axes.labelcolor": "#4a5568", "xtick.color": "#4a5568",
+                         "ytick.color": "#4a5568", "axes.titlecolor": "#1e2a38", "axes.titlesize": 11,
+                         "axes.grid": True, "grid.color": "#e1e5eb", "grid.linewidth": 0.8, "axes.axisbelow": True,
+                         "figure.facecolor": "#ffffff", "axes.facecolor": "#ffffff", "legend.labelcolor": "#4a5568"})
     # E1 bar: F1 and FPR
     e1 = R["E1_detection"]
     names = list(e1)

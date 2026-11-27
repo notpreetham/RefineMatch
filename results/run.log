@@ -1,13 +1,13 @@
-[E1] RefineMatch (full)                                   AUC=1.000 AP=1.000 P=1.00 R=1.00 F1=1.00 FPR=0.00 (12.3 ms/window)
-[E1]   - no benign contrast                               AUC=0.871 AP=0.691 P=0.48 R=1.00 F1=0.65 FPR=0.74 (9.0 ms/window)
-[E1]   - no temporal order                                AUC=0.904 AP=0.671 P=0.80 R=1.00 F1=0.89 FPR=0.17 (11.9 ms/window)
-[E1]   - no novelty term                                  AUC=1.000 AP=1.000 P=1.00 R=1.00 F1=1.00 FPR=0.00 (7.5 ms/window)
-[E1]   - no individualization                             AUC=0.940 AP=0.937 P=1.00 R=0.88 F1=0.94 FPR=0.00 (11.3 ms/window)
-[E1] WL-histogram anomaly (UNICORN-style)                 AUC=0.489 AP=0.441 P=0.45 R=0.15 F1=0.23 FPR=0.12 (3.5 ms/window)
-[E1] TCR-histogram anomaly                                AUC=0.479 AP=0.433 P=0.41 R=0.12 F1=0.18 FPR=0.11 (10.5 ms/window)
+[E1] RefineMatch (full)                                   AUC=1.000 AP=1.000 P=1.00 R=1.00 F1=1.00 FPR=0.00 (12.8 ms/window)
+[E1]   - no benign contrast                               AUC=0.871 AP=0.691 P=0.48 R=1.00 F1=0.65 FPR=0.74 (10.4 ms/window)
+[E1]   - no temporal order                                AUC=0.904 AP=0.671 P=0.80 R=1.00 F1=0.89 FPR=0.17 (12.8 ms/window)
+[E1]   - no novelty term                                  AUC=1.000 AP=1.000 P=1.00 R=1.00 F1=1.00 FPR=0.00 (8.0 ms/window)
+[E1]   - no individualization                             AUC=0.940 AP=0.937 P=1.00 R=0.88 F1=0.94 FPR=0.00 (12.2 ms/window)
+[E1] WL-histogram anomaly (UNICORN-style)                 AUC=0.489 AP=0.441 P=0.45 R=0.15 F1=0.23 FPR=0.12 (3.6 ms/window)
+[E1] TCR-histogram anomaly                                AUC=0.479 AP=0.433 P=0.41 R=0.12 F1=0.18 FPR=0.11 (11.2 ms/window)
 [E1] Per-host z-score                                     AUC=0.716 AP=0.628 P=0.60 R=0.20 F1=0.30 FPR=0.09 (0.5 ms/window)
 [E1] Threshold rules (Sigma-style)                        AUC=0.636 AP=0.299 P=0.48 R=1.00 F1=0.65 FPR=0.73 (0.2 ms/window)
-[E1] Host WL features + logistic regression (supervised) [uses labels] AUC=0.565 AP=0.463 P=0.56 R=0.15 F1=0.24 FPR=0.08 (3.3 ms/window)
+[E1] Host WL features + logistic regression (supervised) [uses labels] AUC=0.565 AP=0.463 P=0.56 R=0.15 F1=0.24 FPR=0.08 (3.5 ms/window)
 [E3] stealth=0.0: RefineMatch=1.00, Threshold=1.00, WL-histogram=0.10
 [E3] stealth=0.25: RefineMatch=1.00, Threshold=0.97, WL-histogram=0.10
 [E3] stealth=0.5: RefineMatch=0.80, Threshold=0.93, WL-histogram=0.10
@@ -19,7 +19,7 @@
 [E4] jitter_s: 0->1.00, 120->0.98, 900->0.83
 [E4] beacon_jitter: 0->1.00, 2->1.00, 6->1.00
 [E4] certificate soundness: 0 violations / 141 checks
-[E5] incremental TCR 16.5 us/event vs static WL recompute 2306 us/event (x140); stream 9222 ev/s; latency {'network_scan': 0.0, 'kerberoasting': 36.26666212081909, 'lateral_movement': 132.50695705413818, 'exfiltration': 219.01011204719543}
+[E5] incremental TCR 16.6 us/event vs static WL recompute 2335 us/event (x141); stream 9035 ev/s; latency {'network_scan': 0.0, 'kerberoasting': 36.26666212081909, 'lateral_movement': 132.50695705413818, 'exfiltration': 219.01011204719543}
 [E6] stealth=0.0: best single window 1.00 -> campaign 1.00 (discovery, credential-access, lateral-movement, exfiltration)
 [E6] stealth=0.6: best single window 1.00 -> campaign 1.00 (discovery, credential-access, lateral-movement)
 [E6] stealth=0.9: best single window 1.00 -> campaign 0.99 (discovery, credential-access, lateral-movement)
@@ -29,5 +29,5 @@
 [E8] network_scan: shared template recall@B=1.00 FPR@B=0.00 privacy_ok=True
 [E8] exfiltration: shared template recall@B=1.00 FPR@B=0.00 privacy_ok=True
 [E8] c2_beaconing: shared template recall@B=1.00 FPR@B=0.00 privacy_ok=True
-[E9] {'0': {'score': 0.0, 'lateral_exhaustive': False, 'lateral_confidence': 0.5206611570247934, 'seconds': 0.007710000005317852}, '1': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.028246083005797118}, '2': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.02831362502183765}, '3': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.028048790991306305}}
-done in 38s -> results/report.md
+[E9] {'0': {'score': 0.0, 'lateral_exhaustive': False, 'lateral_confidence': 0.5206611570247934, 'seconds': 0.007722500013187528}, '1': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.028217249986482784}, '2': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.02879804198164493}, '3': {'score': 0.925, 'lateral_exhaustive': True, 'lateral_confidence': 1.0, 'seconds': 0.028360625001369044}}
+done in 40s -> results/report.md

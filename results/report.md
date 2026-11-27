@@ -6,16 +6,16 @@ Synthetic enterprise benchmark, seed 0, 148 test windows (60 with attacks). Refi
 
 | Detector | AUC | AP | Precision | Recall | F1 | FPR | ms/window |
 |---|---|---|---|---|---|---|---|
-| RefineMatch (full) | 1.000 | 1.000 | 1.00 | 1.00 | 1.00 | 0.00 | 12.3 |
-| - no benign contrast | 0.871 | 0.691 | 0.48 | 1.00 | 0.65 | 0.74 | 9.0 |
-| - no temporal order | 0.904 | 0.671 | 0.80 | 1.00 | 0.89 | 0.17 | 11.9 |
-| - no novelty term | 1.000 | 1.000 | 1.00 | 1.00 | 1.00 | 0.00 | 7.5 |
-| - no individualization | 0.940 | 0.937 | 1.00 | 0.88 | 0.94 | 0.00 | 11.3 |
-| WL-histogram anomaly (UNICORN-style) | 0.489 | 0.441 | 0.45 | 0.15 | 0.23 | 0.12 | 3.5 |
-| TCR-histogram anomaly | 0.479 | 0.433 | 0.41 | 0.12 | 0.18 | 0.11 | 10.5 |
+| RefineMatch (full) | 1.000 | 1.000 | 1.00 | 1.00 | 1.00 | 0.00 | 12.8 |
+| - no benign contrast | 0.871 | 0.691 | 0.48 | 1.00 | 0.65 | 0.74 | 10.4 |
+| - no temporal order | 0.904 | 0.671 | 0.80 | 1.00 | 0.89 | 0.17 | 12.8 |
+| - no novelty term | 1.000 | 1.000 | 1.00 | 1.00 | 1.00 | 0.00 | 8.0 |
+| - no individualization | 0.940 | 0.937 | 1.00 | 0.88 | 0.94 | 0.00 | 12.2 |
+| WL-histogram anomaly (UNICORN-style) | 0.489 | 0.441 | 0.45 | 0.15 | 0.23 | 0.12 | 3.6 |
+| TCR-histogram anomaly | 0.479 | 0.433 | 0.41 | 0.12 | 0.18 | 0.11 | 11.2 |
 | Per-host z-score | 0.716 | 0.628 | 0.60 | 0.20 | 0.30 | 0.09 | 0.5 |
 | Threshold rules (Sigma-style) | 0.636 | 0.299 | 0.48 | 1.00 | 0.65 | 0.73 | 0.2 |
-| Host WL features + logistic regression (supervised) [uses labels] | 0.565 | 0.463 | 0.56 | 0.15 | 0.24 | 0.08 | 3.3 |
+| Host WL features + logistic regression (supervised) [uses labels] | 0.565 | 0.463 | 0.56 | 0.15 | 0.24 | 0.08 | 3.5 |
 
 ## E2 Per-scenario recall / look-alike false-positive rate
 
@@ -66,8 +66,8 @@ Empirical detection rate vs. perturbation budget:
 
 ## E5 Streaming
 
-- Keeping colours current: incremental TCR **16.5 µs/event** vs recomputing static WL 2306 µs/event (**×140**, over 800 events).
-- End-to-end streaming detector: 9222 events/s (67 triggered match checks).
+- Keeping colours current: incremental TCR **16.6 µs/event** vs recomputing static WL 2335 µs/event (**×141**, over 800 events).
+- End-to-end streaming detector: 9035 events/s (67 triggered match checks).
 - Detection latency after the last attack event: network_scan: 0s, kerberoasting: 36s, lateral_movement: 133s, exfiltration: 219s
 
 ## E6 Campaign stitching
@@ -168,7 +168,7 @@ ALERT c2_beaconing [command-and-control; T1071.001, T1573]  score=0.98 (critical
 |---|---|---|---|---|
 | 0 | 0.00 | False | 0.52 | 0.008 |
 | 1 | 0.93 | True | 1.00 | 0.028 |
-| 2 | 0.93 | True | 1.00 | 0.028 |
+| 2 | 0.93 | True | 1.00 | 0.029 |
 | 3 | 0.93 | True | 1.00 | 0.028 |
 
-_Total runtime 38s._
+_Total runtime 40s._

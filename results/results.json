@@ -12,7 +12,7 @@
       "tn": 88,
       "auc": 1.0,
       "ap": 1.0,
-      "ms_per_window": 12.25755987940608
+      "ms_per_window": 12.817344150027713
     },
     "  - no benign contrast": {
       "threshold": 0.65,
@@ -26,7 +26,7 @@
       "tn": 23,
       "auc": 0.8710227272727272,
       "ap": 0.6906536544220253,
-      "ms_per_window": 9.035324728166735
+      "ms_per_window": 10.403790989437619
     },
     "  - no temporal order": {
       "threshold": 0.65,
@@ -40,7 +40,7 @@
       "tn": 73,
       "auc": 0.9036931818181818,
       "ap": 0.6710142312334229,
-      "ms_per_window": 11.89330461862925
+      "ms_per_window": 12.789426623163996
     },
     "  - no novelty term": {
       "threshold": 0.65,
@@ -54,7 +54,7 @@
       "tn": 88,
       "auc": 1.0,
       "ap": 1.0,
-      "ms_per_window": 7.536446725999987
+      "ms_per_window": 7.984249978452115
     },
     "  - no individualization": {
       "threshold": 0.65,
@@ -68,7 +68,7 @@
       "tn": 88,
       "auc": 0.9400568181818182,
       "ap": 0.936690052935751,
-      "ms_per_window": 11.32147859882664
+      "ms_per_window": 12.2452974319458
     },
     "WL-histogram anomaly (UNICORN-style)": {
       "threshold": 0.28628803307473355,
@@ -82,7 +82,7 @@
       "tn": 77,
       "auc": 0.48920454545454545,
       "ap": 0.4405584847438755,
-      "ms_per_window": 3.5016407837738863
+      "ms_per_window": 3.6427426982570337
     },
     "TCR-histogram anomaly": {
       "threshold": 0.2913932316696713,
@@ -96,7 +96,7 @@
       "tn": 78,
       "auc": 0.47945075757575756,
       "ap": 0.432929572682463,
-      "ms_per_window": 10.49521001609596
+      "ms_per_window": 11.202063109423662
     },
     "Per-host z-score": {
       "threshold": 0.5303133870762011,
@@ -110,7 +110,7 @@
       "tn": 80,
       "auc": 0.7162878787878788,
       "ap": 0.6281072115841284,
-      "ms_per_window": 0.45018904917948954
+      "ms_per_window": 0.5162422721450394
     },
     "Threshold rules (Sigma-style)": {
       "threshold": 1.0,
@@ -124,7 +124,7 @@
       "tn": 24,
       "auc": 0.6363636363636364,
       "ap": 0.2985246237878785,
-      "ms_per_window": 0.16136427183408997
+      "ms_per_window": 0.16644677600345095
     },
     "Host WL features + logistic regression (supervised) [uses labels]": {
       "threshold": 0.9938108925639167,
@@ -138,7 +138,7 @@
       "tn": 81,
       "auc": 0.5647727272727273,
       "ap": 0.4627689171380742,
-      "ms_per_window": 3.3083252004674963
+      "ms_per_window": 3.530797120687124
     }
   },
   "E2_per_scenario": {
@@ -377,14 +377,14 @@
   "E5_streaming": {
     "refinement_update": {
       "events": 800,
-      "incremental_tcr_us": 16.453384996566456,
-      "recompute_static_wl_us": 2305.7374474956305,
-      "speedup": 140.13757339154216
+      "incremental_tcr_us": 16.573646280448884,
+      "recompute_static_wl_us": 2335.0152087732567,
+      "speedup": 140.88723563068672
     },
     "stream_events": 5414,
-    "stream_seconds": 0.5870677500206511,
-    "events_per_second": 9222.104262769592,
-    "tcr_us_per_event": 16.557277557797907,
+    "stream_seconds": 0.5992418749956414,
+    "events_per_second": 9034.749115354094,
+    "tcr_us_per_event": 16.98580975435285,
     "match_checks": 67,
     "detection_latency_s": {
       "network_scan": 0.0,
@@ -546,31 +546,31 @@
       "score": 0.0,
       "lateral_exhaustive": false,
       "lateral_confidence": 0.5206611570247934,
-      "seconds": 0.007710000005317852
+      "seconds": 0.007722500013187528
     },
     "1": {
       "score": 0.925,
       "lateral_exhaustive": true,
       "lateral_confidence": 1.0,
-      "seconds": 0.028246083005797118
+      "seconds": 0.028217249986482784
     },
     "2": {
       "score": 0.925,
       "lateral_exhaustive": true,
       "lateral_confidence": 1.0,
-      "seconds": 0.02831362502183765
+      "seconds": 0.02879804198164493
     },
     "3": {
       "score": 0.925,
       "lateral_exhaustive": true,
       "lateral_confidence": 1.0,
-      "seconds": 0.028048790991306305
+      "seconds": 0.028360625001369044
     }
   },
   "meta": {
     "quick": false,
     "seed": 0,
-    "seconds": 37.840031147003174,
+    "seconds": 40.19526219367981,
     "test_windows": 148,
     "attack_windows": 60,
     "threshold_refinematch": 0.65
