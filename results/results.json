@@ -1,0 +1,578 @@
+{
+  "E1_detection": {
+    "RefineMatch (full)": {
+      "threshold": 0.65,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "tp": 60,
+      "fp": 0,
+      "fn": 0,
+      "tn": 88,
+      "auc": 1.0,
+      "ap": 1.0,
+      "ms_per_window": 12.817344150027713
+    },
+    "  - no benign contrast": {
+      "threshold": 0.65,
+      "precision": 0.48,
+      "recall": 1.0,
+      "f1": 0.6486486486486487,
+      "fpr": 0.7386363636363636,
+      "tp": 60,
+      "fp": 65,
+      "fn": 0,
+      "tn": 23,
+      "auc": 0.8710227272727272,
+      "ap": 0.6906536544220253,
+      "ms_per_window": 10.403790989437619
+    },
+    "  - no temporal order": {
+      "threshold": 0.65,
+      "precision": 0.8,
+      "recall": 1.0,
+      "f1": 0.888888888888889,
+      "fpr": 0.17045454545454544,
+      "tp": 60,
+      "fp": 15,
+      "fn": 0,
+      "tn": 73,
+      "auc": 0.9036931818181818,
+      "ap": 0.6710142312334229,
+      "ms_per_window": 12.789426623163996
+    },
+    "  - no novelty term": {
+      "threshold": 0.65,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "fpr": 0.0,
+      "tp": 60,
+      "fp": 0,
+      "fn": 0,
+      "tn": 88,
+      "auc": 1.0,
+      "ap": 1.0,
+      "ms_per_window": 7.984249978452115
+    },
+    "  - no individualization": {
+      "threshold": 0.65,
+      "precision": 1.0,
+      "recall": 0.8833333333333333,
+      "f1": 0.9380530973451328,
+      "fpr": 0.0,
+      "tp": 53,
+      "fp": 0,
+      "fn": 7,
+      "tn": 88,
+      "auc": 0.9400568181818182,
+      "ap": 0.936690052935751,
+      "ms_per_window": 12.2452974319458
+    },
+    "WL-histogram anomaly (UNICORN-style)": {
+      "threshold": 0.28628803307473355,
+      "precision": 0.45,
+      "recall": 0.15,
+      "f1": 0.22500000000000003,
+      "fpr": 0.125,
+      "tp": 9,
+      "fp": 11,
+      "fn": 51,
+      "tn": 77,
+      "auc": 0.48920454545454545,
+      "ap": 0.4405584847438755,
+      "ms_per_window": 3.6427426982570337
+    },
+    "TCR-histogram anomaly": {
+      "threshold": 0.2913932316696713,
+      "precision": 0.4117647058823529,
+      "recall": 0.11666666666666667,
+      "f1": 0.1818181818181818,
+      "fpr": 0.11363636363636363,
+      "tp": 7,
+      "fp": 10,
+      "fn": 53,
+      "tn": 78,
+      "auc": 0.47945075757575756,
+      "ap": 0.432929572682463,
+      "ms_per_window": 11.202063109423662
+    },
+    "Per-host z-score": {
+      "threshold": 0.5303133870762011,
+      "precision": 0.6,
+      "recall": 0.2,
+      "f1": 0.3,
+      "fpr": 0.09090909090909091,
+      "tp": 12,
+      "fp": 8,
+      "fn": 48,
+      "tn": 80,
+      "auc": 0.7162878787878788,
+      "ap": 0.6281072115841284,
+      "ms_per_window": 0.5162422721450394
+    },
+    "Threshold rules (Sigma-style)": {
+      "threshold": 1.0,
+      "precision": 0.4838709677419355,
+      "recall": 1.0,
+      "f1": 0.6521739130434783,
+      "fpr": 0.7272727272727273,
+      "tp": 60,
+      "fp": 64,
+      "fn": 0,
+      "tn": 24,
+      "auc": 0.6363636363636364,
+      "ap": 0.2985246237878785,
+      "ms_per_window": 0.16644677600345095
+    },
+    "Host WL features + logistic regression (supervised) [uses labels]": {
+      "threshold": 0.9938108925639167,
+      "precision": 0.5625,
+      "recall": 0.15,
+      "f1": 0.23684210526315785,
+      "fpr": 0.07954545454545454,
+      "tp": 9,
+      "fp": 7,
+      "fn": 51,
+      "tn": 81,
+      "auc": 0.5647727272727273,
+      "ap": 0.4627689171380742,
+      "ms_per_window": 3.530797120687124
+    }
+  },
+  "E2_per_scenario": {
+    "RefineMatch (full)": {
+      "recall:lateral_movement": 1.0,
+      "recall:kerberoasting": 1.0,
+      "recall:network_scan": 1.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 1.0,
+      "fpr:admin_jump": 0.0,
+      "fpr:monitoring_sweep": 0.0,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.0,
+      "fpr:update_polling": 0.0,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.0
+    },
+    "  - no benign contrast": {
+      "recall:lateral_movement": 1.0,
+      "recall:kerberoasting": 1.0,
+      "recall:network_scan": 1.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 1.0,
+      "fpr:admin_jump": 1.0,
+      "fpr:monitoring_sweep": 1.0,
+      "fpr:cloud_sync": 0.875,
+      "fpr:ticket_renewal": 1.0,
+      "fpr:update_polling": 1.0,
+      "fpr:noncausal_logons": 0.5,
+      "fpr:plain_benign": 0.55
+    },
+    "  - no temporal order": {
+      "recall:lateral_movement": 1.0,
+      "recall:kerberoasting": 1.0,
+      "recall:network_scan": 1.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 1.0,
+      "fpr:admin_jump": 0.0,
+      "fpr:monitoring_sweep": 0.125,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.25,
+      "fpr:update_polling": 0.125,
+      "fpr:noncausal_logons": 0.875,
+      "fpr:plain_benign": 0.1
+    },
+    "  - no novelty term": {
+      "recall:lateral_movement": 1.0,
+      "recall:kerberoasting": 1.0,
+      "recall:network_scan": 1.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 1.0,
+      "fpr:admin_jump": 0.0,
+      "fpr:monitoring_sweep": 0.0,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.0,
+      "fpr:update_polling": 0.0,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.0
+    },
+    "  - no individualization": {
+      "recall:lateral_movement": 0.8333333333333334,
+      "recall:kerberoasting": 0.9166666666666666,
+      "recall:network_scan": 0.9166666666666666,
+      "recall:exfiltration": 0.9166666666666666,
+      "recall:c2_beaconing": 0.8333333333333334,
+      "fpr:admin_jump": 0.0,
+      "fpr:monitoring_sweep": 0.0,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.0,
+      "fpr:update_polling": 0.0,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.0
+    },
+    "WL-histogram anomaly (UNICORN-style)": {
+      "recall:lateral_movement": 0.16666666666666666,
+      "recall:kerberoasting": 0.08333333333333333,
+      "recall:network_scan": 0.08333333333333333,
+      "recall:exfiltration": 0.16666666666666666,
+      "recall:c2_beaconing": 0.25,
+      "fpr:admin_jump": 0.125,
+      "fpr:monitoring_sweep": 0.0,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.25,
+      "fpr:update_polling": 0.25,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.15
+    },
+    "TCR-histogram anomaly": {
+      "recall:lateral_movement": 0.16666666666666666,
+      "recall:kerberoasting": 0.0,
+      "recall:network_scan": 0.08333333333333333,
+      "recall:exfiltration": 0.16666666666666666,
+      "recall:c2_beaconing": 0.16666666666666666,
+      "fpr:admin_jump": 0.125,
+      "fpr:monitoring_sweep": 0.0,
+      "fpr:cloud_sync": 0.0,
+      "fpr:ticket_renewal": 0.25,
+      "fpr:update_polling": 0.25,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.125
+    },
+    "Per-host z-score": {
+      "recall:lateral_movement": 0.0,
+      "recall:kerberoasting": 0.0,
+      "recall:network_scan": 0.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 0.0,
+      "fpr:admin_jump": 0.0,
+      "fpr:monitoring_sweep": 0.125,
+      "fpr:cloud_sync": 0.5,
+      "fpr:ticket_renewal": 0.0,
+      "fpr:update_polling": 0.25,
+      "fpr:noncausal_logons": 0.125,
+      "fpr:plain_benign": 0.0
+    },
+    "Threshold rules (Sigma-style)": {
+      "recall:lateral_movement": 1.0,
+      "recall:kerberoasting": 1.0,
+      "recall:network_scan": 1.0,
+      "recall:exfiltration": 1.0,
+      "recall:c2_beaconing": 1.0,
+      "fpr:admin_jump": 1.0,
+      "fpr:monitoring_sweep": 1.0,
+      "fpr:cloud_sync": 0.625,
+      "fpr:ticket_renewal": 1.0,
+      "fpr:update_polling": 0.75,
+      "fpr:noncausal_logons": 1.0,
+      "fpr:plain_benign": 0.525
+    },
+    "Host WL features + logistic regression (supervised) [uses labels]": {
+      "recall:lateral_movement": 0.08333333333333333,
+      "recall:kerberoasting": 0.25,
+      "recall:network_scan": 0.08333333333333333,
+      "recall:exfiltration": 0.16666666666666666,
+      "recall:c2_beaconing": 0.16666666666666666,
+      "fpr:admin_jump": 0.125,
+      "fpr:monitoring_sweep": 0.125,
+      "fpr:cloud_sync": 0.125,
+      "fpr:ticket_renewal": 0.375,
+      "fpr:update_polling": 0.0,
+      "fpr:noncausal_logons": 0.0,
+      "fpr:plain_benign": 0.025
+    }
+  },
+  "E3_stealth": {
+    "0.0": {
+      "RefineMatch (full)": 1.0,
+      "Threshold rules (Sigma-style)": 1.0,
+      "WL-histogram anomaly (UNICORN-style)": 0.1
+    },
+    "0.25": {
+      "RefineMatch (full)": 1.0,
+      "Threshold rules (Sigma-style)": 0.9666666666666667,
+      "WL-histogram anomaly (UNICORN-style)": 0.1
+    },
+    "0.5": {
+      "RefineMatch (full)": 0.8,
+      "Threshold rules (Sigma-style)": 0.9333333333333333,
+      "WL-histogram anomaly (UNICORN-style)": 0.1
+    },
+    "0.75": {
+      "RefineMatch (full)": 0.7,
+      "Threshold rules (Sigma-style)": 0.9,
+      "WL-histogram anomaly (UNICORN-style)": 0.1
+    },
+    "1.0": {
+      "RefineMatch (full)": 0.4666666666666667,
+      "Threshold rules (Sigma-style)": 0.8666666666666667,
+      "WL-histogram anomaly (UNICORN-style)": 0.1
+    }
+  },
+  "E4_robustness": {
+    "certified_radius": {
+      "lateral_movement": {
+        "median": 1000000.0,
+        "frac_infinite": 1.0,
+        "min": Infinity,
+        "median_fixed_novelty": 1000000.0
+      },
+      "kerberoasting": {
+        "median": 8.5,
+        "frac_infinite": 0.0,
+        "min": 1.0,
+        "median_fixed_novelty": 8.5
+      },
+      "network_scan": {
+        "median": 13.0,
+        "frac_infinite": 0.0,
+        "min": 6.0,
+        "median_fixed_novelty": 16.0
+      },
+      "exfiltration": {
+        "median": 1.0,
+        "frac_infinite": 0.0,
+        "min": 1.0,
+        "median_fixed_novelty": 1.0
+      },
+      "c2_beaconing": {
+        "median": 3.0,
+        "frac_infinite": 0.0,
+        "min": 2.0,
+        "median_fixed_novelty": 4.0
+      }
+    },
+    "soundness_checks": 141,
+    "soundness_violations": 0,
+    "empirical_detection_rate": {
+      "delete": {
+        "0": 1.0,
+        "1": 0.95,
+        "3": 0.75,
+        "10": 0.38333333333333336
+      },
+      "noise": {
+        "0": 1.0,
+        "20": 1.0,
+        "100": 1.0
+      },
+      "mimicry": {
+        "0": 1.0,
+        "3": 1.0,
+        "12": 1.0
+      },
+      "jitter_s": {
+        "0": 1.0,
+        "120": 0.9833333333333333,
+        "900": 0.8333333333333334
+      },
+      "beacon_jitter": {
+        "0": 1.0,
+        "2": 1.0,
+        "6": 1.0
+      }
+    }
+  },
+  "E5_streaming": {
+    "refinement_update": {
+      "events": 800,
+      "incremental_tcr_us": 16.573646280448884,
+      "recompute_static_wl_us": 2335.0152087732567,
+      "speedup": 140.88723563068672
+    },
+    "stream_events": 5414,
+    "stream_seconds": 0.5992418749956414,
+    "events_per_second": 9034.749115354094,
+    "tcr_us_per_event": 16.98580975435285,
+    "match_checks": 67,
+    "detection_latency_s": {
+      "network_scan": 0.0,
+      "kerberoasting": 36.26666212081909,
+      "lateral_movement": 132.50695705413818,
+      "exfiltration": 219.01011204719543
+    },
+    "alerts": [
+      [
+        "network_scan",
+        [
+          "HD01",
+          "WS003"
+        ],
+        1.0
+      ],
+      [
+        "network_scan",
+        [
+          "ADM01",
+          "WS003"
+        ],
+        1.0
+      ],
+      [
+        "kerberoasting",
+        [
+          "DC01",
+          "WS003"
+        ],
+        1.0
+      ],
+      [
+        "lateral_movement",
+        [
+          "SRV02",
+          "WS002",
+          "WS011"
+        ],
+        1.0
+      ],
+      [
+        "exfiltration",
+        [
+          "EVIL001",
+          "FS01",
+          "SRV02"
+        ],
+        0.875
+      ]
+    ]
+  },
+  "E6_campaign": {
+    "0.0": {
+      "max_single_window_score": 1.0,
+      "campaign_score": 0.999875,
+      "tactics": [
+        "discovery",
+        "credential-access",
+        "lateral-movement",
+        "exfiltration"
+      ],
+      "narrative": [
+        "discovery: network_scan on ADM01, WS005 (score 1.00)",
+        "credential-access: kerberoasting on DC01, WS005 (score 1.00)",
+        "lateral-movement: lateral_movement on WS005, WS025, WS039 (score 1.00)",
+        "exfiltration: exfiltration on EVIL001, FS01, SRV03 (score 0.88)"
+      ],
+      "windows_alerting": 4
+    },
+    "0.6": {
+      "max_single_window_score": 1.0,
+      "campaign_score": 0.999,
+      "tactics": [
+        "discovery",
+        "credential-access",
+        "lateral-movement"
+      ],
+      "narrative": [
+        "discovery: network_scan on ADM01, WS005 (score 1.00)",
+        "credential-access: kerberoasting on DC01, WS005 (score 1.00)",
+        "lateral-movement: lateral_movement on WS005, WS007, WS039 (score 1.00)"
+      ],
+      "windows_alerting": 3
+    },
+    "0.9": {
+      "max_single_window_score": 1.0,
+      "campaign_score": 0.995,
+      "tactics": [
+        "discovery",
+        "credential-access",
+        "lateral-movement"
+      ],
+      "narrative": [
+        "discovery: network_scan on DNS01, WS005 (score 0.50)",
+        "credential-access: kerberoasting on DC01, WS005 (score 1.00)",
+        "lateral-movement: lateral_movement on WS005, WS007, WS039 (score 1.00)"
+      ],
+      "windows_alerting": 2
+    }
+  },
+  "E7_explanations": {
+    "certificates": 60,
+    "verified": 60,
+    "tamper_detected": 60,
+    "mean_evidence_events": 1.6,
+    "examples": {
+      "lateral_movement": "ALERT lateral_movement [lateral-movement; T1021, T1550.002]  score=1.00 (critical)\n  hosts: a=WS024(workstation), b=WS034(workstation), c=WS019(workstation)\n  evidence (causal order):\n    [1] 2023-11-18 14:21:40  WS024 -> WS034  auth_remote  (count=1)\n    [2] 2023-11-18 14:27:21  WS034 -> WS019  auth_remote  (count=1)\n  attack_sim=1.00  benign_sim=0.00  novelty=1.00  temporal=1.00  structural=1.00\n  why not benign: no benign counterpart (admin_jump, helpdesk_support) matches these hosts\n  unexplained: WS024(workstation)->WS034(workstation) 'auth_remote' cannot match any edge of admin_jump\n  unexplained: WS034(workstation)->WS019(workstation) 'auth_remote' cannot match any edge of admin_jump\n  search: 1 individualization(s), exhaustive\n  robustness: certified radius inf edits (deletion >= inf, insertion >= inf)",
+      "kerberoasting": "ALERT kerberoasting [credential-access; T1558.003, T1087.002]  score=1.00 (critical)\n  hosts: a=WS015(workstation), d=DC01(dc)\n  evidence (causal order):\n    [1] 2023-11-19 02:30:16  WS015 -> DC01  ldap  (count=1)\n    [2] 2023-11-19 02:30:18  WS015 -> DC01  kerberos_tgs  (count=19)\n  attack_sim=1.00  benign_sim=0.00  novelty=1.00  temporal=1.00  structural=1.00\n  why not benign: no benign counterpart (service_ticket_renewal) matches these hosts\n  unexplained: WS015(workstation)->DC01(dc) 'ldap' cannot match any edge of service_ticket_renewal\n  unexplained: WS015(workstation)->DC01(dc) 'kerberos_tgs' cannot match any edge of service_ticket_renewal\n  search: 0 individualization(s), exhaustive\n  robustness: certified radius 10 edits (deletion >= 10, insertion >= inf)",
+      "network_scan": "ALERT network_scan [discovery; T1046, T1018]  score=1.00 (critical)\n  hosts: s=WS035(workstation), t=ADM01(admin_ws)\n  fact: WS035 contacted 23 distinct hosts via 'conn' (threshold 15)\n  fact: 23 interchangeable hosts fit pattern node 't'\n  evidence (causal order):\n    [1] 2023-11-19 14:22:44  WS035 -> ADM01  conn  (count=1)\n  attack_sim=1.00  benign_sim=0.00  novelty=1.00  temporal=1.00  structural=1.00\n  why not benign: no benign counterpart (monitoring_sweep) matches these hosts\n  unexplained: WS035(workstation)->ADM01(admin_ws) 'conn' cannot match any edge of monitoring_sweep\n  search: 0 individualization(s), exhaustive\n  robustness: certified radius 9 edits (deletion >= 9, insertion >= inf); 12 deletions if the novelty term cannot be manipulated",
+      "exfiltration": "ALERT exfiltration [exfiltration; T1041, T1567, T1039]  score=0.88 (critical)\n  hosts: a=WS014(workstation), f=FS01(fileserver), x=EVIL001(external)\n  evidence (causal order):\n    [1] 2023-11-20 02:26:51  WS014 -> FS01  smb_file  (count=7)\n    [2] 2023-11-20 02:37:46  WS014 -> EVIL001  http_upload  (count=1)\n  attack_sim=1.00  benign_sim=0.12  novelty=1.00  temporal=1.00  structural=1.00\n  why not benign: closest benign template 'cloud_sync' explains only 12% of the weighted evidence\n  unexplained: WS014(workstation)->EVIL001(external) 'http_upload' cannot match any edge of cloud_sync\n  search: 0 individualization(s), exhaustive\n  robustness: certified radius 1 edits (deletion >= 7, insertion >= 1)",
+      "c2_beaconing": "ALERT c2_beaconing [command-and-control; T1071.001, T1573]  score=0.98 (critical)\n  hosts: a=WS004(workstation), x=EVIL013(external)\n  evidence (causal order):\n    [1] 2023-11-20 14:26:39  WS004 -> EVIL013  http  (count=22)\n  attack_sim=1.00  benign_sim=0.00  novelty=0.85  temporal=1.00  structural=1.00\n  why not benign: no benign counterpart (update_polling) matches these hosts\n  unexplained: WS004(workstation)->EVIL013(external) 'http' cannot match any edge of update_polling\n  search: 0 individualization(s), exhaustive\n  robustness: certified radius 2 edits (deletion >= 2, insertion >= inf); 3 deletions if the novelty term cannot be manipulated"
+    }
+  },
+  "E8_sharing": {
+    "lateral_movement": {
+      "recall_at_B": 1.0,
+      "fpr_at_B": 0.0,
+      "privacy_all_ok": true,
+      "signature_rejects_tampering": true,
+      "template_nodes": 3,
+      "template_edges": 2
+    },
+    "kerberoasting": {
+      "recall_at_B": 1.0,
+      "fpr_at_B": 0.0,
+      "privacy_all_ok": true,
+      "signature_rejects_tampering": true,
+      "template_nodes": 2,
+      "template_edges": 2
+    },
+    "network_scan": {
+      "recall_at_B": 1.0,
+      "fpr_at_B": 0.0,
+      "privacy_all_ok": true,
+      "signature_rejects_tampering": true,
+      "template_nodes": 2,
+      "template_edges": 1
+    },
+    "exfiltration": {
+      "recall_at_B": 1.0,
+      "fpr_at_B": 0.0,
+      "privacy_all_ok": true,
+      "signature_rejects_tampering": true,
+      "template_nodes": 3,
+      "template_edges": 2
+    },
+    "c2_beaconing": {
+      "recall_at_B": 1.0,
+      "fpr_at_B": 0.0,
+      "privacy_all_ok": true,
+      "signature_rejects_tampering": true,
+      "template_nodes": 2,
+      "template_edges": 1
+    }
+  },
+  "E9_individualization": {
+    "0": {
+      "score": 0.0,
+      "lateral_exhaustive": false,
+      "lateral_confidence": 0.5206611570247934,
+      "seconds": 0.007722500013187528
+    },
+    "1": {
+      "score": 0.925,
+      "lateral_exhaustive": true,
+      "lateral_confidence": 1.0,
+      "seconds": 0.028217249986482784
+    },
+    "2": {
+      "score": 0.925,
+      "lateral_exhaustive": true,
+      "lateral_confidence": 1.0,
+      "seconds": 0.02879804198164493
+    },
+    "3": {
+      "score": 0.925,
+      "lateral_exhaustive": true,
+      "lateral_confidence": 1.0,
+      "seconds": 0.028360625001369044
+    }
+  },
+  "meta": {
+    "quick": false,
+    "seed": 0,
+    "seconds": 40.19526219367981,
+    "test_windows": 148,
+    "attack_windows": 60,
+    "threshold_refinematch": 0.65
+  }
+}

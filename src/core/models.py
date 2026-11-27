@@ -1,8 +1,8 @@
 """Core data models shared across modules."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import networkx as nx
 
 
@@ -17,6 +17,11 @@ class EventRecord:
     destination_port: Optional[int] = None
     bytes: Optional[int] = None
     duration: Optional[float] = None
+    label: Optional[str] = None  # ground truth (e.g. "benign", "attack:lateral_movement"); never read by detectors
+
+    @property
+    def ts(self) -> float:
+        return self.timestamp.timestamp()
 
 
 @dataclass
@@ -55,6 +60,19 @@ class RefinementResult:
     color_classes: Dict[str, List[str]]
     iterations: int
     stable: bool
+    history: List[Dict[str, str]] = field(default_factory=list)  # colors per iteration (0 = initial)
+
+
+@dataclass
+class EvidenceEdge:
+    """One observed event that satisfies one pattern edge."""
+    pattern_src: str
+    pattern_dst: str
+    source: str
+    destination: str
+    event_type: str
+    timestamp: float
+    order: int
 
 
 @dataclass
@@ -66,6 +84,13 @@ class MatchResult:
     unmatched_reference_nodes: List[str]
     individualization_count: int
     confidence: float
+    pattern_name: str = ""
+    evidence: List[EvidenceEdge] = field(default_factory=list)
+    edge_coverage: float = 0.0
+    temporal_score: float = 0.0
+    exhaustive: bool = True
+    embeddings: List[Any] = field(default_factory=list)  # matching.matcher.Embedding objects, best first
+    trace: List[Dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
@@ -77,4 +102,12 @@ class ScoreResult:
     benign_similarity: float
     contrastive_score: float
     risk_level: str
-    
+    best_benign: Optional[str] = None
+
+
+def make_event(t: float, s: str, d: str, etype: str, nbytes: Optional[int] = None, label: Optional[str] = "benign",
+               port: Optional[int] = None, duration: Optional[float] = None) -> EventRecord:
+    """Convenience constructor from a POSIX timestamp."""
+    from datetime import timezone
+    return EventRecord(timestamp=datetime.fromtimestamp(float(t), tz=timezone.utc), source=s, destination=d,
+                       event_type=etype, bytes=nbytes, label=label, destination_port=port, duration=duration)
